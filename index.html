@@ -74,9 +74,9 @@
 <div class="settings-bar" id="settings-bar">
   <span class="settings-label">Sync</span>
   <input class="settings-input" id="masterkey-input" type="password" placeholder="Paste JSONBin master key...">
-  <input class="settings-input" id="binid-input" type="text" placeholder="Bin ID (leave blank to create new)..." style="max-width:220px;">
+  <input class="settings-input" id="binid-input" type="text" placeholder="Bin ID (from jsonbin.io/app)..." style="max-width:220px;">
   <button class="settings-btn" onclick="saveApiSettings()">Connect</button>
-  <span class="settings-status" id="settings-status"></span>
+  <span class="settings-status" id="settings-status">Create a bin at <a href='https://jsonbin.io/app' target='_blank' style='color:#888'>jsonbin.io/app</a>, then paste the ID above.</span>
 </div>
 
 <div id="categories-container">
@@ -301,16 +301,17 @@
       const res = await fetch('https://api.jsonbin.io/v3/b', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Master-Key': key, 'X-Bin-Name': 'daily_plan_260627' },
-        body: JSON.stringify({})
+        body: JSON.stringify({checked: {}})
       });
       const data = await res.json();
+      console.log('JSONBin create response:', JSON.stringify(data));
       const binId = data.metadata?.id;
-      if (!binId) throw new Error('No bin ID returned');
+      if (!binId) throw new Error('Response: ' + JSON.stringify(data));
       localStorage.setItem(BIN_ID_STORE, binId);
       document.getElementById('binid-input').value = binId;
-      setStatus('Created new bin: ' + binId, true);
+      setStatus('Created new bin: ' + binId + ' — save this ID!', true);
     } catch(e) {
-      setStatus('Error creating bin: ' + e.message, false);
+      setStatus('Error: ' + e.message + ' — try creating a bin manually at jsonbin.io and pasting the ID above.', false);
     }
   }
 
