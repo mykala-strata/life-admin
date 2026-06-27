@@ -64,6 +64,27 @@
   .settings-status.err { color: #a05a5a; }
   .saving-indicator { position: fixed; bottom: 16px; right: 16px; font-family: inherit; font-size: 0.72rem; font-weight: 200; color: #aaa; opacity: 0; transition: opacity 0.3s; }
   .saving-indicator.visible { opacity: 1; }
+
+  /* Flag */
+  .flag-btn { background: none; border: none; cursor: pointer; padding: 2px 4px; font-size: 0.85rem; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; margin-top: 1px; line-height: 1; }
+  li:hover .flag-btn { opacity: 0.4; }
+  li.flagged .flag-btn { opacity: 1; }
+  li.flagged { background: #fdf8ee; }
+  li.flagged > .item-text { font-weight: 800; color: #1a1a1a; }
+  .flag-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #c9a84c; flex-shrink: 0; margin-top: 6px; }
+  li:not(.flagged) .flag-dot { display: none; }
+
+  /* Drag handles — categories */
+  .drag-handle { cursor: grab; font-size: 0.85rem; color: #ccc; padding: 0 4px; user-select: none; line-height: 1; }
+  .drag-handle:hover { color: #999; }
+  .block.dragging { opacity: 0.4; }
+  .block.drag-over { border-top: 2px solid #c9a84c; }
+
+  /* Drag — items */
+  li[draggable] { cursor: default; }
+  li.item-dragging { opacity: 0.4; }
+  li.item-drag-over { border-top: 2px solid #c9a84c; }
+  .ul-drag-over { background: #f5f2ea; border-radius: 4px; }
 </style>
 </head>
 <body>
@@ -112,40 +133,38 @@ const DEFAULT_STATE = {
     {
       id: 'cat-claude', name: 'Claude & Project Docs',
       items: [
-        { id: 'i1', text: 'Upload recipe screenshots to Claude', note: 'exact amounts for chili + screenshot-based recipes', checked: false, catId: 'cat-claude' },
-        { id: 'i2', text: 'Upload Notion recipe markdown files', note: 'optional — CSV done, markdowns may have more detail', checked: false, catId: 'cat-claude' },
         { id: 'i3', text: 'Share Strata music demo', note: '', checked: false, catId: 'cat-claude' },
         { id: 'i4', text: 'Organize files', note: 'downloads, iCloud, desktop', checked: false, catId: 'cat-claude' },
+        { id: 'i1', text: 'Upload recipe screenshots to Claude', note: 'exact amounts for chili + screenshot-based recipes', checked: true, catId: 'cat-claude' },
+        { id: 'i2', text: 'Upload Notion recipe markdown files', note: 'optional — CSV done, markdowns may have more detail', checked: true, catId: 'cat-claude' },
       ]
     },
     {
       id: 'cat-family', name: 'Family',
       items: [
-        { id: 'i5', text: 'Pick up grandma from dialysis', note: '', checked: false, catId: 'cat-family' },
+        { id: 'i5', text: 'Pick up grandma from dialysis', note: '', checked: true, catId: 'cat-family' },
       ]
     },
     {
       id: 'cat-garden', name: 'Garden',
       items: [
-        { id: 'i6', text: "Go to Lowe's for flowers, dirt, and other items", note: 'check note', checked: false, catId: 'cat-garden' },
         { id: 'i7', text: 'Plant tomatoes and petunias', note: '', checked: false, catId: 'cat-garden' },
       ]
     },
     {
-      id: 'cat-fair', name: 'County Fair',
+      id: 'cat-fair', name: 'Errands',
       items: [
         { id: 'i8', text: 'Go to the fair for lunch', note: 'corn dog, sesame chicken — note the place, pineapple whip or homemade ice cream, elephant ear maybe for grandma', checked: false, catId: 'cat-fair' },
+        { id: 'i6', text: "Go to Lowe's for flowers, dirt, and other items", note: 'check note', checked: false, catId: 'cat-fair' },
       ]
     },
     {
-      id: 'cat-personal', name: 'Personal',
+      id: 'cat-personal', name: 'Personal Care',
       items: [
         { id: 'i9', text: 'Haircut', note: '', checked: false, catId: 'cat-personal' },
         { id: 'i10', text: 'Wash purse', note: '', checked: false, catId: 'cat-personal' },
-        { id: 'i11', text: 'Read magazines', note: '', checked: false, catId: 'cat-personal' },
         { id: 'i12', text: 'Hand treatment', note: 'figure out setup', checked: false, catId: 'cat-personal' },
         { id: 'i13', text: 'Find vitamin D and fish oil', note: '', checked: false, catId: 'cat-personal' },
-        { id: 'i14', text: 'Laundry', note: '', checked: false, catId: 'cat-personal' },
       ]
     },
     {
@@ -158,23 +177,23 @@ const DEFAULT_STATE = {
     {
       id: 'cat-car', name: 'Car',
       items: [
-        { id: 'i17', text: 'Vacuum car', note: '', checked: false, catId: 'cat-car' },
-        { id: 'i18', text: 'Clean car interior', note: '', checked: false, catId: 'cat-car' },
-        { id: 'i19', text: 'Fill tires up', note: '', checked: false, catId: 'cat-car' },
         { id: 'i20', text: 'Get brakes replaced', note: '', checked: false, catId: 'cat-car' },
+        { id: 'i19', text: 'Fill tires up', note: '', checked: true, catId: 'cat-car' },
+        { id: 'i18', text: 'Clean car interior', note: '', checked: true, catId: 'cat-car' },
+        { id: 'i17', text: 'Vacuum car', note: '', checked: true, catId: 'cat-car' },
       ]
     },
     {
       id: 'cat-kitchen', name: 'Kitchen & Food',
       items: [
         { id: 'i21', text: 'Watch one pot pasta YouTube video', note: '~17 min — add ingredients to shopping list after', checked: false, catId: 'cat-kitchen' },
-        { id: 'i22', text: 'Freeze peanut butter in Kong for dog treats', note: '', checked: false, catId: 'cat-kitchen' },
       ]
     },
     {
       id: 'cat-pets', name: 'Pets',
       items: [
         { id: 'i23', text: "Look into Paddy's records for vaccinations", note: '', checked: false, catId: 'cat-pets' },
+        { id: 'i22', text: 'Freeze peanut butter in Kong for dog treats', note: '', checked: false, catId: 'cat-pets' },
       ]
     },
     {
@@ -182,6 +201,19 @@ const DEFAULT_STATE = {
       items: [
         { id: 'i24', text: 'Figure out tax payment for Ambitus work', note: '', checked: false, catId: 'cat-admin' },
         { id: 'i25', text: 'Figure out Wi-Fi extender', note: '', checked: false, catId: 'cat-admin' },
+      ]
+    },
+    {
+      id: 'cat-1782601999805', name: 'Chores',
+      items: [
+        { id: 'i14', text: 'Laundry', note: '', checked: false, catId: 'cat-1782601999805' },
+      ]
+    },
+    {
+      id: 'cat-1782602024204', name: 'Hobbies',
+      items: [
+        { id: 'i11', text: 'Read magazines', note: '', checked: false, catId: 'cat-1782602024204' },
+        { id: 'item-101-1782602035496', text: 'Play PS4', note: '', checked: false, catId: 'cat-1782602024204' },
       ]
     },
   ]
@@ -297,6 +329,7 @@ function captureState() {
         text: fullText,
         note: noteText,
         checked: li.classList.contains('checked'),
+        flagged: li.classList.contains('flagged'),
         catId: block.id
       });
     });
@@ -317,6 +350,7 @@ function captureState() {
         text: fullText,
         note: noteText,
         checked: true,
+        flagged: li.classList.contains('flagged'),
         catId
       });
     }
@@ -335,6 +369,7 @@ function renderState(state) {
     const block = createCategoryBlock(cat.id, cat.name);
     container.appendChild(block);
     const ul = block.querySelector('ul');
+    attachUlDrop(ul);
     cat.items.forEach(item => {
       const li = createLi(item.id, item.text, item.note);
       if (item.checked) {
@@ -362,8 +397,10 @@ function createCategoryBlock(id, name) {
   const block = document.createElement('div');
   block.className = 'block';
   block.id = id;
+  block.draggable = true;
   block.innerHTML = `
     <div class="category-header">
+      <span class="drag-handle" title="Drag to reorder">&#8942;&#8942;</span>
       <span class="time-label" data-label="true">${name}</span>
       <div class="cat-btn-group">
         <button class="edit-cat-btn" onclick="editCategory(this)">rename</button>
@@ -378,14 +415,19 @@ function createCategoryBlock(id, name) {
       </div>
       <button class="add-item-btn" onclick="addItem(this)">Add</button>
     </div>`;
+  attachCategoryDrag(block);
+  attachUlDrop(block.querySelector('ul'));
   return block;
 }
 
-function createLi(id, text, note) {
+function createLi(id, text, note, flagged) {
   const li = document.createElement('li');
   li.dataset.id = id;
+  li.draggable = true;
+  if (flagged) li.classList.add('flagged');
   const noteHtml = note ? ` <span class="note">(${note})</span>` : '';
-  li.innerHTML = `<input type="checkbox"><span class="item-text">${text}${noteHtml}</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span>`;
+  li.innerHTML = `<span class="flag-dot"></span><input type="checkbox"><button class="flag-btn" onclick="toggleFlag(this)" title="Flag">&#9679;</button><span class="item-text">${text}${noteHtml}</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span>`;
+  attachItemDrag(li);
   return li;
 }
 
@@ -590,6 +632,123 @@ function addCategory() {
   });
   input.value = '';
   debouncedSave();
+}
+
+// ---- FLAG ----
+function toggleFlag(btn) {
+  const li = btn.closest('li');
+  li.classList.toggle('flagged');
+  debouncedSave();
+}
+
+// ---- DRAG: CATEGORIES ----
+let dragSrcBlock = null;
+
+function attachCategoryDrag(block) {
+  block.addEventListener('dragstart', e => {
+    // only drag from handle
+    if (!e.target.classList.contains('drag-handle') && !e.target.closest('.drag-handle')) {
+      e.preventDefault(); return;
+    }
+    dragSrcBlock = block;
+    block.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  block.addEventListener('dragend', () => {
+    block.classList.remove('dragging');
+    document.querySelectorAll('.block.drag-over').forEach(b => b.classList.remove('drag-over'));
+    dragSrcBlock = null;
+    debouncedSave();
+  });
+  block.addEventListener('dragover', e => {
+    if (!dragSrcBlock || dragSrcBlock === block) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    document.querySelectorAll('.block.drag-over').forEach(b => b.classList.remove('drag-over'));
+    block.classList.add('drag-over');
+  });
+  block.addEventListener('drop', e => {
+    if (!dragSrcBlock || dragSrcBlock === block) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const container = document.getElementById('categories-container');
+    const blocks = [...container.querySelectorAll('.block')];
+    const srcIdx = blocks.indexOf(dragSrcBlock);
+    const tgtIdx = blocks.indexOf(block);
+    if (srcIdx < tgtIdx) {
+      container.insertBefore(dragSrcBlock, block.nextSibling);
+    } else {
+      container.insertBefore(dragSrcBlock, block);
+    }
+    block.classList.remove('drag-over');
+  });
+}
+
+// ---- DRAG: ITEMS ----
+let dragSrcLi = null;
+
+function attachItemDrag(li) {
+  li.addEventListener('dragstart', e => {
+    // don't drag if clicking flag or action buttons
+    if (e.target.classList.contains('flag-btn') || e.target.classList.contains('action-btn') || e.target.tagName === 'INPUT') {
+      e.preventDefault(); return;
+    }
+    dragSrcLi = li;
+    li.classList.add('item-dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.stopPropagation(); // don't trigger category drag
+  });
+  li.addEventListener('dragend', () => {
+    li.classList.remove('item-dragging');
+    document.querySelectorAll('.item-drag-over').forEach(el => el.classList.remove('item-drag-over'));
+    document.querySelectorAll('.ul-drag-over').forEach(el => el.classList.remove('ul-drag-over'));
+    dragSrcLi = null;
+    debouncedSave();
+  });
+  li.addEventListener('dragover', e => {
+    if (!dragSrcLi || dragSrcLi === li) return;
+    e.preventDefault();
+    e.stopPropagation();
+    document.querySelectorAll('.item-drag-over').forEach(el => el.classList.remove('item-drag-over'));
+    li.classList.add('item-drag-over');
+  });
+  li.addEventListener('drop', e => {
+    if (!dragSrcLi || dragSrcLi === li) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const targetUl = li.parentElement;
+    targetUl.insertBefore(dragSrcLi, li);
+    li.classList.remove('item-drag-over');
+    // update catId if moved to new category
+    const newBlock = targetUl.closest('.block');
+    if (newBlock) dragSrcLi.dataset.catId = newBlock.id;
+    updateBlockVisibility(newBlock);
+    const oldBlock = document.getElementById(dragSrcLi.dataset.catId);
+    if (oldBlock && oldBlock !== newBlock) updateBlockVisibility(oldBlock);
+  });
+}
+
+// also allow dropping onto empty ul
+function attachUlDrop(ul) {
+  ul.addEventListener('dragover', e => {
+    if (!dragSrcLi) return;
+    e.preventDefault();
+    e.stopPropagation();
+    ul.classList.add('ul-drag-over');
+  });
+  ul.addEventListener('dragleave', () => ul.classList.remove('ul-drag-over'));
+  ul.addEventListener('drop', e => {
+    if (!dragSrcLi) return;
+    e.preventDefault();
+    e.stopPropagation();
+    ul.appendChild(dragSrcLi);
+    ul.classList.remove('ul-drag-over');
+    const newBlock = ul.closest('.block');
+    if (newBlock) {
+      dragSrcLi.dataset.catId = newBlock.id;
+      updateBlockVisibility(newBlock);
+    }
+  });
 }
 
 // ---- INIT ----
