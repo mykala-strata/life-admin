@@ -12,6 +12,7 @@
 
 
 
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Telegraf', sans-serif; font-weight: 400; background: #F7F5F0; color: #1a1a1a; padding: 48px 40px; max-width: 680px; margin: 0 auto; line-height: 1.6; }
   h1 { font-weight: 800; font-size: 2.6rem; letter-spacing: -0.02em; margin-bottom: 4px; }
@@ -44,11 +45,7 @@
   .add-item-btn:hover { background: #e8e5e0; }
   .edit-input { font-family: inherit; font-size: 0.95rem; background: #fff; border: 1px solid #d0cdc7; padding: 3px 6px; color: #1a1a1a; outline: none; width: 100%; border-radius: 2px; }
   .cat-edit-input { font-family: inherit; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; background: transparent; border: none; border-bottom: 1.5px dashed #d0cdc7; padding: 2px; color: #888; outline: none; width: 160px; }
-
-  /* Move to category popup */
   .move-select { font-family: inherit; font-size: 0.78rem; background: #fff; border: 1px solid #d0cdc7; color: #555; padding: 3px 6px; border-radius: 2px; cursor: pointer; outline: none; max-width: 140px; }
-
-  /* Add new category section */
   .new-cat-section { margin-bottom: 32px; padding: 16px 18px; border: 1.5px dashed #d0cdc7; border-radius: 4px; }
   .new-cat-label { font-weight: 800; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: #bbb; margin-bottom: 10px; }
   .new-cat-row { display: flex; gap: 8px; }
@@ -56,9 +53,6 @@
   .new-cat-input::placeholder { color: #ccc; font-weight: 400; text-transform: none; letter-spacing: 0; }
   .new-cat-btn { font-family: inherit; font-size: 0.75rem; font-weight: 800; background: none; border: 1px solid #d0cdc7; color: #888; padding: 4px 12px; cursor: pointer; border-radius: 2px; white-space: nowrap; }
   .new-cat-btn:hover { background: #e8e5e0; }
-
-
-  /* JSONBin settings bar */
   .settings-bar { background: #edeae4; border-radius: 4px; padding: 12px 16px; margin-bottom: 36px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .settings-bar.connected { background: #e8f0e8; }
   .settings-label { font-weight: 800; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: #888; white-space: nowrap; }
@@ -68,6 +62,8 @@
   .settings-status { font-weight: 200; font-size: 0.78rem; color: #888; flex-basis: 100%; }
   .settings-status.ok { color: #5a875a; }
   .settings-status.err { color: #a05a5a; }
+  .saving-indicator { position: fixed; bottom: 16px; right: 16px; font-family: inherit; font-size: 0.72rem; font-weight: 200; color: #aaa; opacity: 0; transition: opacity 0.3s; }
+  .saving-indicator.visible { opacity: 1; }
 </style>
 </head>
 <body>
@@ -75,173 +71,15 @@
 <h1>Today's Plan</h1>
 <div class="date">Saturday, June 27, 2026</div>
 
-
 <div class="settings-bar" id="settings-bar">
   <span class="settings-label">Sync</span>
   <input class="settings-input" id="masterkey-input" type="password" placeholder="Paste JSONBin master key...">
-  <input class="settings-input" id="binid-input" type="text" placeholder="Bin ID (leave blank to create new)..." style="max-width:220px;">
+  <input class="settings-input" id="binid-input" type="text" placeholder="Bin ID (from jsonbin.io/app)..." style="max-width:220px;">
   <button class="settings-btn" onclick="saveApiSettings()">Connect</button>
-  <span class="settings-status" id="settings-status"></span>
+  <span class="settings-status" id="settings-status">Create a bin at <a href='https://jsonbin.io/app' target='_blank' style='color:#888'>jsonbin.io/app</a>, then paste the ID above.</span>
 </div>
 
-<div id="categories-container">
-
-<div class="block" id="cat-claude">
-  <div class="category-header">
-    <span class="time-label" data-label="true">Claude &amp; Project Docs</span>
-    <div class="cat-btn-group">
-      <button class="edit-cat-btn" onclick="editCategory(this)">rename</button>
-      <button class="edit-cat-btn" onclick="deleteCategory(this)">remove</button>
-    </div>
-  </div>
-  <ul>
-    <li data-id="i1"><input type="checkbox"><span class="item-text">Upload recipe screenshots to Claude <span class="note">(exact amounts for chili + screenshot-based recipes)</span></span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-    <li data-id="i2"><input type="checkbox"><span class="item-text">Upload Notion recipe markdown files <span class="note">(optional &mdash; CSV done, markdowns may have more detail)</span></span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-    <li data-id="i3"><input type="checkbox"><span class="item-text">Share Strata music demo</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-    <li data-id="i4"><input type="checkbox"><span class="item-text">Organize files <span class="note">(downloads, iCloud, desktop)</span></span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-  </ul>
-  <div class="add-item-row"><div class="add-item-inputs"><input class="add-item-input" type="text" placeholder="Add item..."><input class="add-note-input" type="text" placeholder="Note (optional)..."></div><button class="add-item-btn" onclick="addItem(this)">Add</button></div>
-</div>
-
-<div class="block" id="cat-family">
-  <div class="category-header">
-    <span class="time-label" data-label="true">Family</span>
-    <div class="cat-btn-group">
-      <button class="edit-cat-btn" onclick="editCategory(this)">rename</button>
-      <button class="edit-cat-btn" onclick="deleteCategory(this)">remove</button>
-    </div>
-  </div>
-  <ul>
-    <li data-id="i5"><input type="checkbox"><span class="item-text">Pick up grandma from dialysis</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-  </ul>
-  <div class="add-item-row"><div class="add-item-inputs"><input class="add-item-input" type="text" placeholder="Add item..."><input class="add-note-input" type="text" placeholder="Note (optional)..."></div><button class="add-item-btn" onclick="addItem(this)">Add</button></div>
-</div>
-
-<div class="block" id="cat-garden">
-  <div class="category-header">
-    <span class="time-label" data-label="true">Garden</span>
-    <div class="cat-btn-group">
-      <button class="edit-cat-btn" onclick="editCategory(this)">rename</button>
-      <button class="edit-cat-btn" onclick="deleteCategory(this)">remove</button>
-    </div>
-  </div>
-  <ul>
-    <li data-id="i6"><input type="checkbox"><span class="item-text">Go to Lowe's for flowers, dirt, and other items <span class="note">(check note)</span></span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-    <li data-id="i7"><input type="checkbox"><span class="item-text">Plant tomatoes and petunias</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-  </ul>
-  <div class="add-item-row"><div class="add-item-inputs"><input class="add-item-input" type="text" placeholder="Add item..."><input class="add-note-input" type="text" placeholder="Note (optional)..."></div><button class="add-item-btn" onclick="addItem(this)">Add</button></div>
-</div>
-
-<div class="block" id="cat-fair">
-  <div class="category-header">
-    <span class="time-label" data-label="true">County Fair</span>
-    <div class="cat-btn-group">
-      <button class="edit-cat-btn" onclick="editCategory(this)">rename</button>
-      <button class="edit-cat-btn" onclick="deleteCategory(this)">remove</button>
-    </div>
-  </div>
-  <ul>
-    <li data-id="i8"><input type="checkbox"><span class="item-text">Go to the fair for lunch <span class="note">(corn dog, sesame chicken &mdash; note the place, pineapple whip or homemade ice cream, elephant ear maybe for grandma)</span></span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-  </ul>
-  <div class="add-item-row"><div class="add-item-inputs"><input class="add-item-input" type="text" placeholder="Add item..."><input class="add-note-input" type="text" placeholder="Note (optional)..."></div><button class="add-item-btn" onclick="addItem(this)">Add</button></div>
-</div>
-
-<div class="block" id="cat-personal">
-  <div class="category-header">
-    <span class="time-label" data-label="true">Personal</span>
-    <div class="cat-btn-group">
-      <button class="edit-cat-btn" onclick="editCategory(this)">rename</button>
-      <button class="edit-cat-btn" onclick="deleteCategory(this)">remove</button>
-    </div>
-  </div>
-  <ul>
-    <li data-id="i9"><input type="checkbox"><span class="item-text">Haircut</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-    <li data-id="i10"><input type="checkbox"><span class="item-text">Wash purse</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-    <li data-id="i11"><input type="checkbox"><span class="item-text">Read magazines</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-    <li data-id="i12"><input type="checkbox"><span class="item-text">Hand treatment <span class="note">(figure out setup)</span></span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-    <li data-id="i13"><input type="checkbox"><span class="item-text">Find vitamin D and fish oil</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-    <li data-id="i14"><input type="checkbox"><span class="item-text">Laundry</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-  </ul>
-  <div class="add-item-row"><div class="add-item-inputs"><input class="add-item-input" type="text" placeholder="Add item..."><input class="add-note-input" type="text" placeholder="Note (optional)..."></div><button class="add-item-btn" onclick="addItem(this)">Add</button></div>
-</div>
-
-<div class="block" id="cat-movement">
-  <div class="category-header">
-    <span class="time-label" data-label="true">Movement</span>
-    <div class="cat-btn-group">
-      <button class="edit-cat-btn" onclick="editCategory(this)">rename</button>
-      <button class="edit-cat-btn" onclick="deleteCategory(this)">remove</button>
-    </div>
-  </div>
-  <ul>
-    <li data-id="i15"><input type="checkbox"><span class="item-text">Exercise</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-    <li data-id="i16"><input type="checkbox"><span class="item-text">Walk to Lucabe Coffee <span class="note">(3.2 miles)</span></span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-  </ul>
-  <div class="add-item-row"><div class="add-item-inputs"><input class="add-item-input" type="text" placeholder="Add item..."><input class="add-note-input" type="text" placeholder="Note (optional)..."></div><button class="add-item-btn" onclick="addItem(this)">Add</button></div>
-</div>
-
-<div class="block" id="cat-car">
-  <div class="category-header">
-    <span class="time-label" data-label="true">Car</span>
-    <div class="cat-btn-group">
-      <button class="edit-cat-btn" onclick="editCategory(this)">rename</button>
-      <button class="edit-cat-btn" onclick="deleteCategory(this)">remove</button>
-    </div>
-  </div>
-  <ul>
-    <li data-id="i17"><input type="checkbox"><span class="item-text">Vacuum car</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-    <li data-id="i18"><input type="checkbox"><span class="item-text">Clean car interior</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-    <li data-id="i19"><input type="checkbox"><span class="item-text">Fill tires up</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-    <li data-id="i20"><input type="checkbox"><span class="item-text">Get brakes replaced</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-  </ul>
-  <div class="add-item-row"><div class="add-item-inputs"><input class="add-item-input" type="text" placeholder="Add item..."><input class="add-note-input" type="text" placeholder="Note (optional)..."></div><button class="add-item-btn" onclick="addItem(this)">Add</button></div>
-</div>
-
-<div class="block" id="cat-kitchen">
-  <div class="category-header">
-    <span class="time-label" data-label="true">Kitchen &amp; Food</span>
-    <div class="cat-btn-group">
-      <button class="edit-cat-btn" onclick="editCategory(this)">rename</button>
-      <button class="edit-cat-btn" onclick="deleteCategory(this)">remove</button>
-    </div>
-  </div>
-  <ul>
-    <li data-id="i21"><input type="checkbox"><span class="item-text">Watch one pot pasta YouTube video <span class="note">(~17 min &mdash; add ingredients to shopping list after)</span></span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-    <li data-id="i22"><input type="checkbox"><span class="item-text">Freeze peanut butter in Kong for dog treats</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-  </ul>
-  <div class="add-item-row"><div class="add-item-inputs"><input class="add-item-input" type="text" placeholder="Add item..."><input class="add-note-input" type="text" placeholder="Note (optional)..."></div><button class="add-item-btn" onclick="addItem(this)">Add</button></div>
-</div>
-
-<div class="block" id="cat-pets">
-  <div class="category-header">
-    <span class="time-label" data-label="true">Pets</span>
-    <div class="cat-btn-group">
-      <button class="edit-cat-btn" onclick="editCategory(this)">rename</button>
-      <button class="edit-cat-btn" onclick="deleteCategory(this)">remove</button>
-    </div>
-  </div>
-  <ul>
-    <li data-id="i23"><input type="checkbox"><span class="item-text">Look into Paddy's records for vaccinations</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-  </ul>
-  <div class="add-item-row"><div class="add-item-inputs"><input class="add-item-input" type="text" placeholder="Add item..."><input class="add-note-input" type="text" placeholder="Note (optional)..."></div><button class="add-item-btn" onclick="addItem(this)">Add</button></div>
-</div>
-
-<div class="block" id="cat-admin">
-  <div class="category-header">
-    <span class="time-label" data-label="true">Admin</span>
-    <div class="cat-btn-group">
-      <button class="edit-cat-btn" onclick="editCategory(this)">rename</button>
-      <button class="edit-cat-btn" onclick="deleteCategory(this)">remove</button>
-    </div>
-  </div>
-  <ul>
-    <li data-id="i24"><input type="checkbox"><span class="item-text">Figure out tax payment for Ambitus work</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-    <li data-id="i25"><input type="checkbox"><span class="item-text">Figure out Wi-Fi extender</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span></li>
-  </ul>
-  <div class="add-item-row"><div class="add-item-inputs"><input class="add-item-input" type="text" placeholder="Add item..."><input class="add-note-input" type="text" placeholder="Note (optional)..."></div><button class="add-item-btn" onclick="addItem(this)">Add</button></div>
-</div>
-
-</div>
+<div id="categories-container"></div>
 
 <div class="new-cat-section">
   <div class="new-cat-label">New Category</div>
@@ -258,347 +96,514 @@
   <div id="completed-categories"></div>
 </div>
 
+<div class="saving-indicator" id="saving-indicator">Saving...</div>
+
 <script>
-  const STORAGE_KEY = 'daily_plan_260627';
-  const API_KEY_STORE = 'jsonbin_masterkey';
-  const BIN_ID_STORE = 'jsonbin_binid_260627';
-  let itemCounter = 30;
-  let syncTimeout = null;
+const DATE_KEY = '260627';
+const STORAGE_KEY = 'daily_plan_' + DATE_KEY;
+const API_KEY_STORE = 'jsonbin_masterkey';
+const BIN_ID_STORE = 'jsonbin_binid_' + DATE_KEY;
+let saveTimeout = null;
+let itemCounter = 100;
 
-  // --- API SETTINGS ---
-  function getApiKey() { return localStorage.getItem(API_KEY_STORE) || ''; }
-  function getBinId() { return localStorage.getItem(BIN_ID_STORE) || ''; }
+// ---- DEFAULT STATE (first load only) ----
+const DEFAULT_STATE = {
+  categories: [
+    {
+      id: 'cat-claude', name: 'Claude & Project Docs',
+      items: [
+        { id: 'i1', text: 'Upload recipe screenshots to Claude', note: 'exact amounts for chili + screenshot-based recipes', checked: false, catId: 'cat-claude' },
+        { id: 'i2', text: 'Upload Notion recipe markdown files', note: 'optional — CSV done, markdowns may have more detail', checked: false, catId: 'cat-claude' },
+        { id: 'i3', text: 'Share Strata music demo', note: '', checked: false, catId: 'cat-claude' },
+        { id: 'i4', text: 'Organize files', note: 'downloads, iCloud, desktop', checked: false, catId: 'cat-claude' },
+      ]
+    },
+    {
+      id: 'cat-family', name: 'Family',
+      items: [
+        { id: 'i5', text: 'Pick up grandma from dialysis', note: '', checked: false, catId: 'cat-family' },
+      ]
+    },
+    {
+      id: 'cat-garden', name: 'Garden',
+      items: [
+        { id: 'i6', text: "Go to Lowe's for flowers, dirt, and other items", note: 'check note', checked: false, catId: 'cat-garden' },
+        { id: 'i7', text: 'Plant tomatoes and petunias', note: '', checked: false, catId: 'cat-garden' },
+      ]
+    },
+    {
+      id: 'cat-fair', name: 'County Fair',
+      items: [
+        { id: 'i8', text: 'Go to the fair for lunch', note: 'corn dog, sesame chicken — note the place, pineapple whip or homemade ice cream, elephant ear maybe for grandma', checked: false, catId: 'cat-fair' },
+      ]
+    },
+    {
+      id: 'cat-personal', name: 'Personal',
+      items: [
+        { id: 'i9', text: 'Haircut', note: '', checked: false, catId: 'cat-personal' },
+        { id: 'i10', text: 'Wash purse', note: '', checked: false, catId: 'cat-personal' },
+        { id: 'i11', text: 'Read magazines', note: '', checked: false, catId: 'cat-personal' },
+        { id: 'i12', text: 'Hand treatment', note: 'figure out setup', checked: false, catId: 'cat-personal' },
+        { id: 'i13', text: 'Find vitamin D and fish oil', note: '', checked: false, catId: 'cat-personal' },
+        { id: 'i14', text: 'Laundry', note: '', checked: false, catId: 'cat-personal' },
+      ]
+    },
+    {
+      id: 'cat-movement', name: 'Movement',
+      items: [
+        { id: 'i15', text: 'Exercise', note: '', checked: false, catId: 'cat-movement' },
+        { id: 'i16', text: 'Walk to Lucabe Coffee', note: '3.2 miles', checked: false, catId: 'cat-movement' },
+      ]
+    },
+    {
+      id: 'cat-car', name: 'Car',
+      items: [
+        { id: 'i17', text: 'Vacuum car', note: '', checked: false, catId: 'cat-car' },
+        { id: 'i18', text: 'Clean car interior', note: '', checked: false, catId: 'cat-car' },
+        { id: 'i19', text: 'Fill tires up', note: '', checked: false, catId: 'cat-car' },
+        { id: 'i20', text: 'Get brakes replaced', note: '', checked: false, catId: 'cat-car' },
+      ]
+    },
+    {
+      id: 'cat-kitchen', name: 'Kitchen & Food',
+      items: [
+        { id: 'i21', text: 'Watch one pot pasta YouTube video', note: '~17 min — add ingredients to shopping list after', checked: false, catId: 'cat-kitchen' },
+        { id: 'i22', text: 'Freeze peanut butter in Kong for dog treats', note: '', checked: false, catId: 'cat-kitchen' },
+      ]
+    },
+    {
+      id: 'cat-pets', name: 'Pets',
+      items: [
+        { id: 'i23', text: "Look into Paddy's records for vaccinations", note: '', checked: false, catId: 'cat-pets' },
+      ]
+    },
+    {
+      id: 'cat-admin', name: 'Admin',
+      items: [
+        { id: 'i24', text: 'Figure out tax payment for Ambitus work', note: '', checked: false, catId: 'cat-admin' },
+        { id: 'i25', text: 'Figure out Wi-Fi extender', note: '', checked: false, catId: 'cat-admin' },
+      ]
+    },
+  ]
+};
 
-  function saveApiSettings() {
-    const key = document.getElementById('masterkey-input').value.trim();
-    const binId = document.getElementById('binid-input').value.trim();
-    if (!key) { setStatus('Please enter a master key.', false); return; }
-    localStorage.setItem(API_KEY_STORE, key);
-    if (binId) localStorage.setItem(BIN_ID_STORE, binId);
-    setStatus('Connecting...', null);
-    if (binId) {
-      loadFromBin();
-    } else {
-      createBin();
-    }
+// ---- API SETTINGS ----
+function getApiKey() { return localStorage.getItem(API_KEY_STORE) || ''; }
+function getBinId() { return localStorage.getItem(BIN_ID_STORE) || ''; }
+
+function saveApiSettings() {
+  const key = document.getElementById('masterkey-input').value.trim();
+  const binId = document.getElementById('binid-input').value.trim();
+  if (!key) { setStatus('Please enter a master key.', false); return; }
+  localStorage.setItem(API_KEY_STORE, key);
+  if (binId) localStorage.setItem(BIN_ID_STORE, binId);
+  setStatus('Connecting...', null);
+  init();
+}
+
+function setStatus(msg, ok) {
+  const el = document.getElementById('settings-status');
+  const bar = document.getElementById('settings-bar');
+  el.innerHTML = msg;
+  el.className = 'settings-status' + (ok === true ? ' ok' : ok === false ? ' err' : '');
+  bar.className = 'settings-bar' + (ok === true ? ' connected' : '');
+}
+
+function updateSettingsBar() {
+  const key = getApiKey();
+  const binId = getBinId();
+  if (key) document.getElementById('masterkey-input').value = '••••••••';
+  if (binId) document.getElementById('binid-input').value = binId;
+  if (key && binId) setStatus('Connected — bin ' + binId, true);
+}
+
+// ---- JSONBIN ----
+async function loadState() {
+  const key = getApiKey();
+  const binId = getBinId();
+  if (!key || !binId) {
+    const local = localStorage.getItem(STORAGE_KEY);
+    return local ? JSON.parse(local) : DEFAULT_STATE;
   }
-
-  function setStatus(msg, ok) {
-    const el = document.getElementById('settings-status');
-    const bar = document.getElementById('settings-bar');
-    el.textContent = msg;
-    el.className = 'settings-status' + (ok === true ? ' ok' : ok === false ? ' err' : '');
-    bar.className = 'settings-bar' + (ok === true ? ' connected' : '');
-  }
-
-  function updateSettingsBar() {
-    const key = getApiKey();
-    const binId = getBinId();
-    if (key) document.getElementById('masterkey-input').value = '••••••••';
-    if (binId) document.getElementById('binid-input').value = binId;
-    if (key && binId) setStatus('Connected — bin ' + binId, true);
-  }
-
-  // --- JSONBIN API ---
-  async function createBin() {
-    const key = getApiKey();
-    try {
-      const res = await fetch('https://api.jsonbin.io/v3/b', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Master-Key': key, 'X-Bin-Name': 'daily_plan_260627' },
-        body: JSON.stringify({})
-      });
-      const data = await res.json();
-      const binId = data.metadata?.id;
-      if (!binId) throw new Error('No bin ID returned');
-      localStorage.setItem(BIN_ID_STORE, binId);
-      document.getElementById('binid-input').value = binId;
-      setStatus('Created new bin: ' + binId, true);
-    } catch(e) {
-      setStatus('Error creating bin: ' + e.message, false);
-    }
-  }
-
-  async function loadFromBin() {
-    const key = getApiKey();
-    const binId = getBinId();
-    if (!key || !binId) return getLocalChecked();
-    try {
-      const res = await fetch('https://api.jsonbin.io/v3/b/' + binId + '/latest', {
-        headers: { 'X-Master-Key': key }
-      });
-      const data = await res.json();
-      setStatus('Connected — bin ' + binId, true);
-      return data.record || {};
-    } catch(e) {
-      setStatus('Could not load from bin, using local.', false);
-      return getLocalChecked();
-    }
-  }
-
-  async function saveToBin(state) {
-    const key = getApiKey();
-    const binId = getBinId();
-    if (!key || !binId) { saveLocalChecked(state); return; }
-    saveLocalChecked(state); // always save locally too as backup
-    try {
-      await fetch('https://api.jsonbin.io/v3/b/' + binId, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'X-Master-Key': key },
-        body: JSON.stringify(state)
-      });
-    } catch(e) {
-      console.warn('JSONBin save failed, local saved:', e);
-    }
-  }
-
-  function debouncedSave(state) {
-    clearTimeout(syncTimeout);
-    syncTimeout = setTimeout(() => saveToBin(state), 600);
-  }
-
-  // --- LOCAL FALLBACK ---
-  function getLocalChecked() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
-  }
-  function saveLocalChecked(obj) { localStorage.setItem(STORAGE_KEY, JSON.stringify(obj)); }
-
-  // --- CHECKED STATE ---
-  let checkedState = {};
-
-  function getChecked() { return checkedState; }
-  function saveChecked(obj) { checkedState = obj; debouncedSave(obj); }
-
-  // --- INIT ---
-  async function init() {
-    updateSettingsBar();
-    const key = getApiKey();
-    const binId = getBinId();
-    checkedState = (key && binId) ? await loadFromBin() : getLocalChecked();
-    initCheckboxes();
-    document.querySelectorAll('.add-item-input, .add-note-input').forEach(input => {
-      input.addEventListener('keydown', e => { if (e.key === 'Enter') addItem(input.closest('.add-item-row').querySelector('.add-item-btn')); });
+  try {
+    const res = await fetch('https://api.jsonbin.io/v3/b/' + binId + '/latest', {
+      headers: { 'X-Master-Key': key }
     });
-    document.getElementById('new-cat-input').addEventListener('keydown', e => {
-      if (e.key === 'Enter') addCategory();
-    });
+    const data = await res.json();
+    setStatus('Connected — bin ' + binId, true);
+    const state = data.record;
+    // if bin is empty or just has checked:{}, fall back to default
+    if (!state || !state.categories) {
+      return DEFAULT_STATE;
+    }
+    return state;
+  } catch(e) {
+    setStatus('Could not reach bin, using local.', false);
+    const local = localStorage.getItem(STORAGE_KEY);
+    return local ? JSON.parse(local) : DEFAULT_STATE;
   }
+}
 
-  function initCheckboxes() {
-    const checked = getChecked();
-    document.querySelectorAll('li[data-id]').forEach(li => {
-      attachCheckbox(li);
-      const cb = li.querySelector('input[type=checkbox]');
-      const state = checked[li.dataset.id];
-      if (state) {
-        cb.checked = true;
+async function saveState() {
+  const state = captureState();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  const key = getApiKey();
+  const binId = getBinId();
+  if (!key || !binId) return;
+  showSaving();
+  try {
+    await fetch('https://api.jsonbin.io/v3/b/' + binId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': key },
+      body: JSON.stringify(state)
+    });
+  } catch(e) {
+    console.warn('JSONBin save failed:', e);
+  }
+  hideSaving();
+}
+
+function debouncedSave() {
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(saveState, 800);
+}
+
+function showSaving() {
+  const el = document.getElementById('saving-indicator');
+  el.textContent = 'Saving...';
+  el.classList.add('visible');
+}
+function hideSaving() {
+  const el = document.getElementById('saving-indicator');
+  el.classList.remove('visible');
+}
+
+// ---- CAPTURE STATE ----
+function captureState() {
+  const categories = [];
+  document.querySelectorAll('#categories-container .block').forEach(block => {
+    const cat = {
+      id: block.id,
+      name: block.querySelector('[data-label]').textContent,
+      items: []
+    };
+    block.querySelectorAll('li[data-id]').forEach(li => {
+      const textSpan = li.querySelector('.item-text');
+      const noteSpan = textSpan ? textSpan.querySelector('.note') : null;
+      const noteText = noteSpan ? noteSpan.textContent.replace(/^\(/, '').replace(/\)$/, '') : '';
+      const fullText = textSpan ? textSpan.childNodes[0]?.textContent?.trim() || textSpan.innerText.split('(')[0].trim() : '';
+      cat.items.push({
+        id: li.dataset.id,
+        text: fullText,
+        note: noteText,
+        checked: li.classList.contains('checked'),
+        catId: block.id
+      });
+    });
+    categories.push(cat);
+  });
+
+  // also capture items in completed section
+  document.querySelectorAll('#completed-categories li[data-id]').forEach(li => {
+    const textSpan = li.querySelector('.item-text');
+    const noteSpan = textSpan ? textSpan.querySelector('.note') : null;
+    const noteText = noteSpan ? noteSpan.textContent.replace(/^\(/, '').replace(/\)$/, '') : '';
+    const fullText = textSpan ? textSpan.childNodes[0]?.textContent?.trim() || '' : '';
+    const catId = li.dataset.catId || 'cat-admin';
+    const cat = categories.find(c => c.id === catId);
+    if (cat) {
+      cat.items.push({
+        id: li.dataset.id,
+        text: fullText,
+        note: noteText,
+        checked: true,
+        catId
+      });
+    }
+  });
+
+  return { categories };
+}
+
+// ---- RENDER ----
+function renderState(state) {
+  const container = document.getElementById('categories-container');
+  container.innerHTML = '';
+  document.getElementById('completed-categories').innerHTML = '';
+
+  state.categories.forEach(cat => {
+    const block = createCategoryBlock(cat.id, cat.name);
+    container.appendChild(block);
+    const ul = block.querySelector('ul');
+    cat.items.forEach(item => {
+      const li = createLi(item.id, item.text, item.note);
+      if (item.checked) {
         li.classList.add('checked');
-        const catId = typeof state === 'object' ? state.catId : getCategoryId(li);
-        const catName = typeof state === 'object' ? state.catName : getCategoryName(li);
-        const completedUl = getOrCreateCompletedGroup(catId, catName);
-        completedUl.appendChild(li);
-      }
-    });
-  }
-
-  function getCategoryName(li) {
-    return li.closest('.block')?.querySelector('[data-label]')?.textContent || 'Other';
-  }
-
-  function getCategoryId(li) {
-    return li.closest('.block')?.id || 'other';
-  }
-
-  function getOrCreateCompletedGroup(catId, catName) {
-    const container = document.getElementById('completed-categories');
-    let group = document.getElementById('completed-group-' + catId);
-    if (!group) {
-      group = document.createElement('div');
-      group.id = 'completed-group-' + catId;
-      const label = document.createElement('div');
-      label.className = 'completed-cat-label';
-      label.textContent = catName;
-      const ul = document.createElement('ul');
-      ul.id = 'completed-ul-' + catId;
-      group.appendChild(label);
-      group.appendChild(ul);
-      container.appendChild(group);
-    }
-    return document.getElementById('completed-ul-' + catId);
-  }
-
-  function removeCompletedGroupIfEmpty(catId) {
-    const ul = document.getElementById('completed-ul-' + catId);
-    if (ul && ul.children.length === 0) {
-      document.getElementById('completed-group-' + catId)?.remove();
-    }
-  }
-
-  function attachCheckbox(li) {
-    const cb = li.querySelector('input[type=checkbox]');
-    cb.style.cssText = 'width:15px;height:15px;flex-shrink:0;margin-top:3px;accent-color:#555;cursor:pointer;';
-    cb.addEventListener('change', () => {
-      const checked = getChecked();
-      if (cb.checked) {
-        const catId = getCategoryId(li);
-        const catName = getCategoryName(li);
-        checked[li.dataset.id] = { checked: true, catId, catName };
-        li.classList.add('checked');
-        const completedUl = getOrCreateCompletedGroup(catId, catName);
+        li.dataset.catId = cat.id;
+        const completedUl = getOrCreateCompletedGroup(cat.id, cat.name);
         completedUl.appendChild(li);
       } else {
-        const savedCatId = typeof checked[li.dataset.id] === 'object' ? checked[li.dataset.id].catId : null;
-        delete checked[li.dataset.id];
-        li.classList.remove('checked');
-        // return to original category block
-        const targetBlock = savedCatId ? document.getElementById(savedCatId) : null;
-        const targetUl = targetBlock ? targetBlock.querySelector('ul') : li.parentElement;
-        targetUl.appendChild(li);
-        removeCompletedGroupIfEmpty(savedCatId);
+        ul.appendChild(li);
       }
-      saveChecked(checked);
-      updateCategoryVisibility();
+      attachCheckbox(li, cat.id, cat.name);
     });
-  }
-
-  function getCategoryList() {
-    return [...document.querySelectorAll('#categories-container .block')].map(b => ({
-      id: b.id, name: b.querySelector('[data-label]').textContent
-    }));
-  }
-
-  function showMoveSelect(btn) {
-    const li = btn.closest('li');
-    document.querySelectorAll('.move-select').forEach(s => s.remove());
-    const cats = getCategoryList();
-    const currentBlock = li.closest('.block');
-    const select = document.createElement('select');
-    select.className = 'move-select';
-    const placeholder = document.createElement('option');
-    placeholder.textContent = 'Move to...'; placeholder.disabled = true; placeholder.selected = true;
-    select.appendChild(placeholder);
-    cats.forEach(c => {
-      if (c.id === currentBlock.id) return;
-      const opt = document.createElement('option');
-      opt.value = c.id; opt.textContent = c.name; select.appendChild(opt);
-    });
-    select.addEventListener('change', () => {
-      const targetBlock = document.getElementById(select.value);
-      if (!targetBlock) return;
-      const cb = li.querySelector('input[type=checkbox]');
-      cb.checked = false; li.classList.remove('checked');
-      const checked = getChecked(); delete checked[li.dataset.id]; saveChecked(checked);
-      select.remove();
-      targetBlock.querySelector('ul').appendChild(li);
-    });
-    btn.closest('.item-actions').appendChild(select);
-    select.focus();
-  }
-
-  function addItem(btn) {
-    const row = btn.closest('.add-item-row');
-    const input = row.querySelector('.add-item-input');
-    const noteInput = row.querySelector('.add-note-input');
-    const text = input.value.trim();
-    if (!text) return;
-    const note = noteInput ? noteInput.value.trim() : '';
-    const ul = btn.closest('.block').querySelector('ul');
-    const id = 'item-' + (++itemCounter);
-    const li = document.createElement('li');
-    li.dataset.id = id;
-    const noteHtml = note ? ` <span class="note">(${note})</span>` : '';
-    li.innerHTML = `<input type="checkbox"><span class="item-text">${text}${noteHtml}</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span>`;
-    ul.appendChild(li); attachCheckbox(li);
-    input.value = ''; if (noteInput) noteInput.value = '';
-    input.focus();
-    updateCategoryVisibility();
-  }
-
-  function editItem(btn) {
-    const li = btn.closest('li');
-    const textSpan = li.querySelector('.item-text');
-    const input = document.createElement('input');
-    input.className = 'edit-input'; input.value = textSpan.innerText;
-    textSpan.replaceWith(input); input.focus();
-    btn.textContent = 'save';
-    btn.onclick = () => saveItem(btn, input);
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') saveItem(btn, input); });
-  }
-
-  function saveItem(btn, input) {
-    const span = document.createElement('span');
-    span.className = 'item-text'; span.textContent = input.value;
-    input.replaceWith(span); btn.textContent = 'edit'; btn.onclick = () => editItem(btn);
-  }
-
-  function deleteItem(btn) {
-    const li = btn.closest('li');
-    const checked = getChecked(); delete checked[li.dataset.id]; saveChecked(checked); li.remove();
-    updateCategoryVisibility();
-  }
-
-  function editCategory(btn) {
-    const label = btn.closest('.category-header').querySelector('[data-label]');
-    const input = document.createElement('input');
-    input.className = 'cat-edit-input'; input.value = label.textContent;
-    label.replaceWith(input); input.focus();
-    btn.textContent = 'save';
-    btn.onclick = () => {
-      const span = document.createElement('span');
-      span.className = 'time-label'; span.dataset.label = 'true'; span.textContent = input.value;
-      input.replaceWith(span); btn.textContent = 'rename'; btn.onclick = () => editCategory(btn);
-    };
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') btn.click(); });
-  }
-
-  function deleteCategory(btn) {
-    const block = btn.closest('.block');
-    const name = block.querySelector('[data-label]').textContent;
-    if (confirm('Remove category "' + name + '"? Items inside will be deleted.')) block.remove();
-  }
-
-  function addCategory() {
-    const input = document.getElementById('new-cat-input');
-    const name = input.value.trim();
-    if (!name) return;
-    const id = 'cat-' + Date.now();
-    const container = document.getElementById('categories-container');
-    const block = document.createElement('div');
-    block.className = 'block'; block.id = id;
-    block.innerHTML = `
-      <div class="category-header">
-        <span class="time-label" data-label="true">${name}</span>
-        <div class="cat-btn-group">
-          <button class="edit-cat-btn" onclick="editCategory(this)">rename</button>
-          <button class="edit-cat-btn" onclick="deleteCategory(this)">remove</button>
-        </div>
-      </div>
-      <ul></ul>
-      <div class="add-item-row">
-        <div class="add-item-inputs"><input class="add-item-input" type="text" placeholder="Add item..."><input class="add-note-input" type="text" placeholder="Note (optional)..."></div>
-        <button class="add-item-btn" onclick="addItem(this)">Add</button>
-      </div>`;
-    container.appendChild(block);
-    block.querySelector('.add-item-input').addEventListener('keydown', e => {
-      if (e.key === 'Enter') addItem(e.target.closest('.add-item-row').querySelector('.add-item-btn'));
-    });
-    block.querySelector('.add-note-input').addEventListener('keydown', e => {
-      if (e.key === 'Enter') addItem(e.target.closest('.add-item-row').querySelector('.add-item-btn'));
-    });
-    input.value = '';
-  }
-
-  function updateCategoryVisibility() {
-    document.querySelectorAll('#categories-container .block').forEach(block => {
-      const items = [...block.querySelectorAll('li[data-id]')];
-      const hasUnchecked = items.some(li => !li.classList.contains('checked'));
-      block.style.display = hasUnchecked ? '' : 'none';
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    init().then(() => updateCategoryVisibility());
+    updateBlockVisibility(block);
   });
+
+  // wire up new inputs
+  document.querySelectorAll('.add-item-input, .add-note-input').forEach(input => {
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') addItem(input.closest('.add-item-row').querySelector('.add-item-btn'));
+    });
+  });
+}
+
+function createCategoryBlock(id, name) {
+  const block = document.createElement('div');
+  block.className = 'block';
+  block.id = id;
+  block.innerHTML = `
+    <div class="category-header">
+      <span class="time-label" data-label="true">${name}</span>
+      <div class="cat-btn-group">
+        <button class="edit-cat-btn" onclick="editCategory(this)">rename</button>
+        <button class="edit-cat-btn" onclick="deleteCategory(this)">remove</button>
+      </div>
+    </div>
+    <ul></ul>
+    <div class="add-item-row">
+      <div class="add-item-inputs">
+        <input class="add-item-input" type="text" placeholder="Add item...">
+        <input class="add-note-input" type="text" placeholder="Note (optional)...">
+      </div>
+      <button class="add-item-btn" onclick="addItem(this)">Add</button>
+    </div>`;
+  return block;
+}
+
+function createLi(id, text, note) {
+  const li = document.createElement('li');
+  li.dataset.id = id;
+  const noteHtml = note ? ` <span class="note">(${note})</span>` : '';
+  li.innerHTML = `<input type="checkbox"><span class="item-text">${text}${noteHtml}</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span>`;
+  return li;
+}
+
+// ---- COMPLETED GROUPS ----
+function getOrCreateCompletedGroup(catId, catName) {
+  const container = document.getElementById('completed-categories');
+  let group = document.getElementById('completed-group-' + catId);
+  if (!group) {
+    group = document.createElement('div');
+    group.id = 'completed-group-' + catId;
+    const label = document.createElement('div');
+    label.className = 'completed-cat-label';
+    label.textContent = catName;
+    const ul = document.createElement('ul');
+    ul.id = 'completed-ul-' + catId;
+    group.appendChild(label);
+    group.appendChild(ul);
+    container.appendChild(group);
+  }
+  return document.getElementById('completed-ul-' + catId);
+}
+
+function removeCompletedGroupIfEmpty(catId) {
+  const ul = document.getElementById('completed-ul-' + catId);
+  if (ul && ul.children.length === 0) {
+    document.getElementById('completed-group-' + catId)?.remove();
+  }
+}
+
+// ---- CHECKBOX ----
+function attachCheckbox(li, catId, catName) {
+  const cb = li.querySelector('input[type=checkbox]');
+  cb.style.cssText = 'width:15px;height:15px;flex-shrink:0;margin-top:3px;accent-color:#555;cursor:pointer;';
+  cb.checked = li.classList.contains('checked');
+
+  cb.addEventListener('change', () => {
+    const block = document.getElementById(catId) || li.closest('.block');
+    const resolvedCatId = block ? block.id : catId;
+    const resolvedCatName = block ? block.querySelector('[data-label]')?.textContent : catName;
+
+    if (cb.checked) {
+      li.classList.add('checked');
+      li.dataset.catId = resolvedCatId;
+      const completedUl = getOrCreateCompletedGroup(resolvedCatId, resolvedCatName);
+      completedUl.appendChild(li);
+      if (block) updateBlockVisibility(block);
+    } else {
+      li.classList.remove('checked');
+      const targetBlock = document.getElementById(resolvedCatId);
+      if (targetBlock) {
+        targetBlock.querySelector('ul').appendChild(li);
+        updateBlockVisibility(targetBlock);
+      }
+      removeCompletedGroupIfEmpty(resolvedCatId);
+    }
+    debouncedSave();
+  });
+}
+
+// ---- VISIBILITY ----
+function updateBlockVisibility(block) {
+  const unchecked = [...block.querySelectorAll('li[data-id]')].filter(li => !li.classList.contains('checked'));
+  block.style.display = unchecked.length === 0 ? 'none' : '';
+}
+
+function updateAllVisibility() {
+  document.querySelectorAll('#categories-container .block').forEach(updateBlockVisibility);
+}
+
+// ---- CATEGORY LIST ----
+function getCategoryList() {
+  return [...document.querySelectorAll('#categories-container .block')].map(b => ({
+    id: b.id, name: b.querySelector('[data-label]').textContent
+  }));
+}
+
+// ---- MOVE ----
+function showMoveSelect(btn) {
+  const li = btn.closest('li');
+  document.querySelectorAll('.move-select').forEach(s => s.remove());
+  const cats = getCategoryList();
+  const currentBlock = li.closest('.block') || document.getElementById(li.dataset.catId);
+  const select = document.createElement('select');
+  select.className = 'move-select';
+  const placeholder = document.createElement('option');
+  placeholder.textContent = 'Move to...'; placeholder.disabled = true; placeholder.selected = true;
+  select.appendChild(placeholder);
+  cats.forEach(c => {
+    if (currentBlock && c.id === currentBlock.id) return;
+    const opt = document.createElement('option');
+    opt.value = c.id; opt.textContent = c.name; select.appendChild(opt);
+  });
+  select.addEventListener('change', () => {
+    const targetBlock = document.getElementById(select.value);
+    if (!targetBlock) return;
+    const cb = li.querySelector('input[type=checkbox]');
+    cb.checked = false;
+    li.classList.remove('checked');
+    li.dataset.catId = select.value;
+    select.remove();
+    targetBlock.querySelector('ul').appendChild(li);
+    if (currentBlock) updateBlockVisibility(currentBlock);
+    updateBlockVisibility(targetBlock);
+    removeCompletedGroupIfEmpty(currentBlock?.id);
+    debouncedSave();
+  });
+  btn.closest('.item-actions').appendChild(select);
+  select.focus();
+}
+
+// ---- ADD ITEM ----
+function addItem(btn) {
+  const row = btn.closest('.add-item-row');
+  const input = row.querySelector('.add-item-input');
+  const noteInput = row.querySelector('.add-note-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const note = noteInput ? noteInput.value.trim() : '';
+  const ul = btn.closest('.block').querySelector('ul');
+  const id = 'item-' + (++itemCounter) + '-' + Date.now();
+  const li = createLi(id, text, note);
+  const block = btn.closest('.block');
+  ul.appendChild(li);
+  attachCheckbox(li, block.id, block.querySelector('[data-label]').textContent);
+  input.value = ''; if (noteInput) noteInput.value = '';
+  input.focus();
+  updateBlockVisibility(block);
+  debouncedSave();
+}
+
+// ---- EDIT ITEM ----
+function editItem(btn) {
+  const li = btn.closest('li');
+  const textSpan = li.querySelector('.item-text');
+  const input = document.createElement('input');
+  input.className = 'edit-input'; input.value = textSpan.innerText;
+  textSpan.replaceWith(input); input.focus();
+  btn.textContent = 'save';
+  btn.onclick = () => saveItem(btn, input);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') saveItem(btn, input); });
+}
+
+function saveItem(btn, input) {
+  const span = document.createElement('span');
+  span.className = 'item-text'; span.textContent = input.value;
+  input.replaceWith(span);
+  btn.textContent = 'edit'; btn.onclick = () => editItem(btn);
+  debouncedSave();
+}
+
+// ---- DELETE ITEM ----
+function deleteItem(btn) {
+  const li = btn.closest('li');
+  const block = li.closest('.block');
+  li.remove();
+  if (block) updateBlockVisibility(block);
+  removeCompletedGroupIfEmpty(li.dataset.catId);
+  debouncedSave();
+}
+
+// ---- EDIT CATEGORY ----
+function editCategory(btn) {
+  const label = btn.closest('.category-header').querySelector('[data-label]');
+  const input = document.createElement('input');
+  input.className = 'cat-edit-input'; input.value = label.textContent;
+  label.replaceWith(input); input.focus();
+  btn.textContent = 'save';
+  btn.onclick = () => {
+    const span = document.createElement('span');
+    span.className = 'time-label'; span.dataset.label = 'true'; span.textContent = input.value;
+    input.replaceWith(span);
+    btn.textContent = 'rename'; btn.onclick = () => editCategory(btn);
+    debouncedSave();
+  };
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') btn.click(); });
+}
+
+// ---- DELETE CATEGORY ----
+function deleteCategory(btn) {
+  const block = btn.closest('.block');
+  const name = block.querySelector('[data-label]').textContent;
+  if (confirm('Remove category "' + name + '"? Items inside will be deleted.')) {
+    removeCompletedGroupIfEmpty(block.id);
+    block.remove();
+    debouncedSave();
+  }
+}
+
+// ---- ADD CATEGORY ----
+function addCategory() {
+  const input = document.getElementById('new-cat-input');
+  const name = input.value.trim();
+  if (!name) return;
+  const id = 'cat-' + Date.now();
+  const container = document.getElementById('categories-container');
+  const block = createCategoryBlock(id, name);
+  container.appendChild(block);
+  block.querySelectorAll('.add-item-input, .add-note-input').forEach(inp => {
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') addItem(inp.closest('.add-item-row').querySelector('.add-item-btn'));
+    });
+  });
+  input.value = '';
+  debouncedSave();
+}
+
+// ---- INIT ----
+async function init() {
+  updateSettingsBar();
+  const state = await loadState();
+  renderState(state);
+  document.getElementById('new-cat-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addCategory();
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
 </script>
 
 </body>
+</html>
