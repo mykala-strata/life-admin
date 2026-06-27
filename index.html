@@ -253,27 +253,49 @@ function updateSettingsBar() {
 async function loadState() {
   const key = getApiKey();
   const binId = getBinId();
-  if (!key || !binId) {
-    const local = localStorage.getItem(STORAGE_KEY);
-    return local ? JSON.parse(local) : DEFAULT_STATE;
-  }
-  try {
-    const res = await fetch('https://api.jsonbin.io/v3/b/' + binId + '/latest', {
-      headers: { 'X-Master-Key': key }
-    });
-    const data = await res.json();
-    setStatus('Connected — bin ' + binId, true);
-    const state = data.record;
-    // if bin is empty or just has checked:{}, fall back to default
-    if (!state || !state.categories) {
+
+  if (key && binId) {
+    try {
+      const res = await fetch('https://api.jsonbin.io/v3/b/' + binId + '/latest', {
+        headers: { 'X-Master-Key': key }
+      });
+      const data = await res.json();
+      const state = data.record;
+      if (state && state.categories && state.categories.length > 0) {
+        setStatus('Connected — bin ' + binId, true);
+        return state;
+      }
+      // bin has no categories yet — push default up
+      setStatus('Connected — initializing...', true);
+      await saveToBinDirect(DEFAULT_STATE);
       return DEFAULT_STATE;
+    } catch(e) {
+      setStatus('Could not reach bin, using local.', false);
     }
-    return state;
-  } catch(e) {
-    setStatus('Could not reach bin, using local.', false);
-    const local = localStorage.getItem(STORAGE_KEY);
-    return local ? JSON.parse(local) : DEFAULT_STATE;
   }
+
+  try {
+    const local = localStorage.getItem(STORAGE_KEY);
+    if (local) {
+      const parsed = JSON.parse(local);
+      if (parsed && parsed.categories && parsed.categories.length > 0) return parsed;
+    }
+  } catch(e) {}
+
+  return DEFAULT_STATE;
+}
+
+async function saveToBinDirect(state) {
+  const key = getApiKey();
+  const binId = getBinId();
+  if (!key || !binId) return;
+  try {
+    await fetch('https://api.jsonbin.io/v3/b/' + binId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': key },
+      body: JSON.stringify(state)
+    });
+  } catch(e) { console.warn('saveToBinDirect failed:', e); }
 }
 
 async function saveState() {
@@ -397,7 +419,6 @@ function createCategoryBlock(id, name) {
   const block = document.createElement('div');
   block.className = 'block';
   block.id = id;
-  block.draggable = true;
   block.innerHTML = `
     <div class="category-header">
       <span class="drag-handle" title="Drag to reorder">&#8942;&#8942;</span>
@@ -645,16 +666,22 @@ function toggleFlag(btn) {
 let dragSrcBlock = null;
 
 function attachCategoryDrag(block) {
+  block.draggable = false; // off by default, only on when handle is hovered
+
+  const handle = block.querySelector('.drag-handle');
+  if (handle) {
+    handle.addEventListener('mousedown', () => { block.draggable = true; });
+    handle.addEventListener('mouseup', () => { block.draggable = false; });
+  }
+
   block.addEventListener('dragstart', e => {
-    // only drag from handle
-    if (!e.target.classList.contains('drag-handle') && !e.target.closest('.drag-handle')) {
-      e.preventDefault(); return;
-    }
     dragSrcBlock = block;
     block.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
+    e.stopPropagation();
   });
   block.addEventListener('dragend', () => {
+    block.draggable = false;
     block.classList.remove('dragging');
     document.querySelectorAll('.block.drag-over').forEach(b => b.classList.remove('drag-over'));
     dragSrcBlock = null;
