@@ -18,8 +18,8 @@
   h1 { font-weight: 800; font-size: 2.6rem; letter-spacing: -0.02em; margin-bottom: 4px; }
   .date { font-weight: 200; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; color: #666; margin-bottom: 40px; }
   .block { margin-bottom: 32px; }
-  .category-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1.5px solid #e0ddd8; }
-  .time-label { font-weight: 800; font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: #888; }
+  .category-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1.5px solid #e0ddd8; }
+  .time-label { font-weight: 800; font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: #888; flex: 1; }
   .cat-btn-group { display: flex; gap: 8px; }
   .edit-cat-btn { background: none; border: none; font-family: inherit; font-size: 0.72rem; color: #bbb; cursor: pointer; padding: 0; }
   .edit-cat-btn:hover { color: #888; }
@@ -421,12 +421,12 @@ function createCategoryBlock(id, name) {
   block.id = id;
   block.innerHTML = `
     <div class="category-header">
-      <span class="drag-handle" title="Drag to reorder">&#8942;&#8942;</span>
       <span class="time-label" data-label="true">${name}</span>
       <div class="cat-btn-group">
         <button class="edit-cat-btn" onclick="editCategory(this)">rename</button>
         <button class="edit-cat-btn" onclick="deleteCategory(this)">remove</button>
       </div>
+      <span class="drag-handle" title="Drag to reorder">&#8942;&#8942;</span>
     </div>
     <ul></ul>
     <div class="add-item-row">
@@ -666,27 +666,32 @@ function toggleFlag(btn) {
 let dragSrcBlock = null;
 
 function attachCategoryDrag(block) {
-  block.draggable = false; // off by default, only on when handle is hovered
+  block.draggable = false;
 
   const handle = block.querySelector('.drag-handle');
   if (handle) {
-    handle.addEventListener('mousedown', () => { block.draggable = true; });
-    handle.addEventListener('mouseup', () => { block.draggable = false; });
+    handle.setAttribute('draggable', 'true');
+    handle.addEventListener('dragstart', e => {
+      e.stopPropagation();
+      dragSrcBlock = block;
+      block.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', block.id);
+    });
+    handle.addEventListener('dragend', () => {
+      block.classList.remove('dragging');
+      document.querySelectorAll('.block.drag-over').forEach(b => b.classList.remove('drag-over'));
+      dragSrcBlock = null;
+      debouncedSave();
+    });
   }
 
   block.addEventListener('dragstart', e => {
-    dragSrcBlock = block;
-    block.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'move';
+    // only allow if triggered from handle
+    if (!dragSrcBlock) { e.preventDefault(); return; }
     e.stopPropagation();
   });
-  block.addEventListener('dragend', () => {
-    block.draggable = false;
-    block.classList.remove('dragging');
-    document.querySelectorAll('.block.drag-over').forEach(b => b.classList.remove('drag-over'));
-    dragSrcBlock = null;
-    debouncedSave();
-  });
+
   block.addEventListener('dragover', e => {
     if (!dragSrcBlock || dragSrcBlock === block) return;
     e.preventDefault();
