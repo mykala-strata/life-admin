@@ -457,6 +457,7 @@
         removeCompletedGroupIfEmpty(savedCatId);
       }
       saveChecked(checked);
+      updateCategoryVisibility();
     });
   }
 
@@ -510,6 +511,7 @@
     ul.appendChild(li); attachCheckbox(li);
     input.value = ''; if (noteInput) noteInput.value = '';
     input.focus();
+    updateCategoryVisibility();
   }
 
   function editItem(btn) {
@@ -532,6 +534,7 @@
   function deleteItem(btn) {
     const li = btn.closest('li');
     const checked = getChecked(); delete checked[li.dataset.id]; saveChecked(checked); li.remove();
+    updateCategoryVisibility();
   }
 
   function editCategory(btn) {
@@ -585,7 +588,17 @@
     input.value = '';
   }
 
-  document.addEventListener('DOMContentLoaded', init);
+  function updateCategoryVisibility() {
+    document.querySelectorAll('#categories-container .block').forEach(block => {
+      const items = [...block.querySelectorAll('li[data-id]')];
+      const hasUnchecked = items.some(li => !li.classList.contains('checked'));
+      block.style.display = hasUnchecked ? '' : 'none';
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    init().then(() => updateCategoryVisibility());
+  });
 </script>
 
 </body>
