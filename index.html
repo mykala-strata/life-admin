@@ -665,27 +665,37 @@ function editItem(btn) {
   const noteSpan = textSpan ? textSpan.querySelector('.note') : null;
   const noteText = noteSpan ? noteSpan.textContent.slice(1, -1) : '';
   const mainText = textSpan ? (textSpan.childNodes[0]?.textContent?.trim() || '') : '';
-  li.dataset.editNote = noteText;
+  const wrapper = document.createElement('span');
+  wrapper.className = 'item-text edit-wrapper';
+  wrapper.style.cssText = 'display:flex; flex-direction:column; gap:4px; flex:1;';
   const input = document.createElement('input');
   input.className = 'edit-input';
   input.value = mainText;
-  textSpan.replaceWith(input);
+  const noteInput = document.createElement('input');
+  noteInput.className = 'edit-input edit-note-input';
+  noteInput.placeholder = 'Note (optional)...';
+  noteInput.value = noteText;
+  noteInput.style.cssText = 'font-size:0.85em; font-weight: 200;';
+  wrapper.appendChild(input);
+  wrapper.appendChild(noteInput);
+  textSpan.replaceWith(wrapper);
   input.focus();
   btn.textContent = 'save';
-  btn.onclick = () => saveItem(btn, input);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') saveItem(btn, input); });
+  btn.onclick = () => saveItem(btn, input, noteInput);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') saveItem(btn, input, noteInput); });
+  noteInput.addEventListener('keydown', e => { if (e.key === 'Enter') saveItem(btn, input, noteInput); });
 }
 
-function saveItem(btn, input) {
+function saveItem(btn, input, noteInput) {
   const li = btn.closest('li');
-  const note = li.dataset.editNote || '';
+  const wrapper = input.closest('.edit-wrapper');
+  const note = noteInput ? noteInput.value.trim() : '';
   const noteHtml = note ? ` <span class="note">(${note})</span>` : '';
   const span = document.createElement('span');
   span.className = 'item-text';
   span.innerHTML = input.value + noteHtml;
-  input.replaceWith(span);
+  wrapper.replaceWith(span);
   btn.textContent = 'edit'; btn.onclick = () => editItem(btn);
-  delete li.dataset.editNote;
   debouncedSave();
 }
 
