@@ -39,6 +39,8 @@
   .action-btn { background: none; border: none; font-family: inherit; font-size: 0.72rem; color: #bbb; cursor: pointer; padding: 2px 4px; white-space: nowrap; }
   .action-btn:hover { color: #555; }
   .note { font-weight: 200; font-size: 0.9em; color: #777; }
+  .note-link { color: #888; text-decoration: none; font-weight: 400; padding: 0 1px; }
+  .note-link:hover { color: #1a1a1a; }
   .divider { border: none; border-top: 2px solid #e0ddd8; margin: 36px 0; }
   .completed-label { font-weight: 800; font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: #bbb; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 1.5px solid #ece9e3; }
   .completed-cat-label { font-weight: 800; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: #ccc; margin: 12px 0 4px; }
@@ -377,7 +379,7 @@ function captureState() {
     block.querySelectorAll('li[data-id]').forEach(li => {
       const textSpan = li.querySelector('.item-text');
       const noteSpan = textSpan ? textSpan.querySelector('.note') : null;
-      const noteText = noteSpan ? noteSpan.textContent.slice(1, -1) : '';
+      const noteText = noteSpan ? (noteSpan.dataset.note !== undefined ? noteSpan.dataset.note : noteSpan.textContent.slice(1, -1)) : '';
       const fullText = textSpan ? textSpan.childNodes[0]?.textContent?.trim() || textSpan.innerText.split('(')[0].trim() : '';
       cat.items.push({
         id: li.dataset.id,
@@ -396,7 +398,7 @@ function captureState() {
   document.querySelectorAll('#completed-categories li[data-id]').forEach(li => {
     const textSpan = li.querySelector('.item-text');
     const noteSpan = textSpan ? textSpan.querySelector('.note') : null;
-    const noteText = noteSpan ? noteSpan.textContent.slice(1, -1) : '';
+    const noteText = noteSpan ? (noteSpan.dataset.note !== undefined ? noteSpan.dataset.note : noteSpan.textContent.slice(1, -1)) : '';
     const fullText = textSpan ? textSpan.childNodes[0]?.textContent?.trim() || '' : '';
     const catId = li.dataset.catId || 'cat-admin';
     const cat = categories.find(c => c.id === catId);
@@ -477,13 +479,48 @@ function createCategoryBlock(id, name) {
   return block;
 }
 
+// ---- TEXT HELPERS ----
+function capitalizeFirst(str) {
+  if (!str) return str;
+  const idx = str.search(/[a-zA-Z]/);
+  if (idx === -1) return str;
+  return str.slice(0, idx) + str.charAt(idx).toUpperCase() + str.slice(idx + 1);
+}
+
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function linkifyNote(note) {
+  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/i;
+  const match = note.match(urlRegex);
+  if (!match) return escapeHtml(note);
+  let url = match[0];
+  const trailingPunct = url.match(/[),.!?;:]+$/);
+  if (trailingPunct) url = url.slice(0, -trailingPunct[0].length);
+  const href = url.startsWith('www.') ? 'https://' + url : url;
+  const before = escapeHtml(note.slice(0, match.index));
+  const after = escapeHtml(note.slice(match.index + url.length));
+  const arrow = `<a href="${href}" target="_blank" rel="noopener noreferrer" class="note-link" title="${escapeHtml(href)}">&#8599;</a>`;
+  return before + arrow + after;
+}
+
+function buildNoteHtml(note) {
+  if (!note) return '';
+  return ` <span class="note" data-note="${escapeHtml(note)}">(${linkifyNote(note)})</span>`;
+}
+
 function createLi(id, text, note, flagged, date) {
   const li = document.createElement('li');
   li.dataset.id = id;
   li.draggable = false;
   if (flagged === true) li.classList.add('flagged');
   if (date) li.dataset.date = date;
-  const noteHtml = note ? ` <span class="note">(${note})</span>` : '';
+  const noteHtml = buildNoteHtml(note);
   const dateHtml = date ? `<span class="item-date">${formatDateBadge(date)}</span>` : '';
   li.innerHTML = `<button class="flag-btn" onclick="toggleFlag(this)" title="Flag">&#9679;</button><input type="checkbox"><span class="item-text">${text}${noteHtml}</span>${dateHtml}<span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="editDate(this)">date</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span><span class="item-drag-handle" title="Drag to reorder">&#8942;&#8942;</span>`;
   attachItemDrag(li);
@@ -642,19 +679,23 @@ function addItem(btn) {
   const input = row.querySelector('.add-item-input');
   const noteInput = row.querySelector('.add-note-input');
   const dateInput = row.querySelector('.add-date-input');
-  const text = input.value.trim();
+  const text = capitalizeFirst(input.value.trim());
   if (!text) return;
   const note = noteInput ? noteInput.value.trim() : '';
   const date = dateInput ? dateInput.value : '';
-  const ul = btn.closest('.block').querySelector('ul');
+  const block = btn.closest('.block');
+  const wasEmpty = block.style.display === 'none' || block.querySelectorAll('li[data-id]').length === 0;
+  const ul = block.querySelector('ul');
   const id = 'item-' + (++itemCounter) + '-' + Date.now();
   const li = createLi(id, text, note, false, date);
-  const block = btn.closest('.block');
   ul.appendChild(li);
   attachCheckbox(li, block.id, block.querySelector('[data-label]').textContent);
   input.value = ''; if (noteInput) noteInput.value = ''; if (dateInput) dateInput.value = '';
   input.focus();
   updateBlockVisibility(block);
+  if (wasEmpty) {
+    document.getElementById('categories-container').appendChild(block);
+  }
   debouncedSave();
 }
 
@@ -663,7 +704,7 @@ function editItem(btn) {
   const li = btn.closest('li');
   const textSpan = li.querySelector('.item-text');
   const noteSpan = textSpan ? textSpan.querySelector('.note') : null;
-  const noteText = noteSpan ? noteSpan.textContent.slice(1, -1) : '';
+  const noteText = noteSpan ? (noteSpan.dataset.note !== undefined ? noteSpan.dataset.note : noteSpan.textContent.slice(1, -1)) : '';
   const mainText = textSpan ? (textSpan.childNodes[0]?.textContent?.trim() || '') : '';
   const wrapper = document.createElement('span');
   wrapper.className = 'item-text edit-wrapper';
@@ -690,10 +731,10 @@ function saveItem(btn, input, noteInput) {
   const li = btn.closest('li');
   const wrapper = input.closest('.edit-wrapper');
   const note = noteInput ? noteInput.value.trim() : '';
-  const noteHtml = note ? ` <span class="note">(${note})</span>` : '';
+  const noteHtml = buildNoteHtml(note);
   const span = document.createElement('span');
   span.className = 'item-text';
-  span.innerHTML = input.value + noteHtml;
+  span.innerHTML = escapeHtml(input.value) + noteHtml;
   wrapper.replaceWith(span);
   btn.textContent = 'edit'; btn.onclick = () => editItem(btn);
   debouncedSave();
@@ -740,7 +781,7 @@ function deleteCategory(btn) {
 // ---- ADD CATEGORY ----
 function addCategory() {
   const input = document.getElementById('new-cat-input');
-  const name = input.value.trim();
+  const name = capitalizeFirst(input.value.trim());
   if (!name) return;
   const id = 'cat-' + Date.now();
   const container = document.getElementById('categories-container');
