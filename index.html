@@ -14,39 +14,41 @@
 
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Telegraf', sans-serif; font-weight: 400; background: #F7F5F0; color: #1a1a1a; padding: 48px 40px; max-width: 680px; margin: 0 auto; line-height: 1.6; }
-  h1 { font-weight: 800; font-size: 2.6rem; letter-spacing: -0.02em; margin-bottom: 4px; }
-  .date { font-weight: 200; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; color: #666; margin-bottom: 40px; }
-  .block { margin-bottom: 32px; }
+  body { font-family: 'Telegraf', sans-serif; font-weight: 400; background: #F7F5F0; color: #1a1a1a; padding: 36px 32px; max-width: 1100px; margin: 0 auto; line-height: 1.5; }
+  h1 { font-weight: 800; font-size: 1.9rem; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .date { font-weight: 200; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: #666; margin-bottom: 28px; }
+  .block { margin-bottom: 24px; }
   .category-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1.5px solid #e0ddd8; }
-  .time-label { font-weight: 800; font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: #888; flex: 1; }
+  .time-label { font-weight: 800; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: #888; flex: 1; }
   .cat-btn-group { display: flex; gap: 8px; }
   .edit-cat-btn { background: none; border: none; font-family: inherit; font-size: 0.72rem; color: #bbb; cursor: pointer; padding: 0; }
   .edit-cat-btn:hover { color: #888; }
   ul { list-style: none; }
-  li { font-weight: 400; font-size: 0.95rem; padding: 7px 0; border-bottom: 1px solid #ece9e3; color: #2a2a2a; display: flex; align-items: flex-start; gap: 10px; }
-  li.checked { color: #bbb; text-decoration: line-through; text-decoration-color: #ccc; }
+  li { font-weight: 400; font-size: 0.82rem; padding: 5px 0; border-bottom: 1px solid #ece9e3; color: #2a2a2a; display: flex; align-items: flex-start; gap: 8px; }
+  li.checked { color: #bbb; text-decoration: line-through; text-decoration-color: #ccc; text-decoration-thickness: 1px; font-size: 0.65em; }
   li .item-text { flex: 1; }
   li .item-actions { display: flex; gap: 4px; flex-shrink: 0; opacity: 0; transition: opacity 0.15s; }
   li:hover .item-actions { opacity: 1; }
   .action-btn { background: none; border: none; font-family: inherit; font-size: 0.72rem; color: #bbb; cursor: pointer; padding: 2px 4px; white-space: nowrap; }
   .action-btn:hover { color: #555; }
-  .note { font-weight: 200; font-size: 0.78rem; color: #777; }
+  .note { font-weight: 200; font-size: 0.9em; color: #777; }
   .divider { border: none; border-top: 2px solid #e0ddd8; margin: 36px 0; }
   .completed-label { font-weight: 800; font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: #bbb; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 1.5px solid #ece9e3; }
-  .completed-cat-label { font-weight: 800; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: #ccc; margin: 16px 0 6px; }
+  .completed-cat-label { font-weight: 800; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: #ccc; margin: 12px 0 4px; }
+  #completed-categories { display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px; }
   .add-item-row { display: flex; flex-direction: column; gap: 5px; margin-top: 8px; }
   .add-item-inputs { display: flex; gap: 8px; }
-  .add-item-input { flex: 1; font-family: inherit; font-size: 0.9rem; background: transparent; border: none; border-bottom: 1px solid #d0cdc7; padding: 5px 2px; color: #1a1a1a; outline: none; }
+  .add-item-input { flex: 1; font-family: inherit; font-size: 0.78rem; background: transparent; border: none; border-bottom: 1px solid #d0cdc7; padding: 4px 2px; color: #1a1a1a; outline: none; }
   .add-item-input::placeholder { color: #ccc; }
-  .add-note-input { flex: 1; font-family: inherit; font-size: 0.78rem; font-weight: 200; background: transparent; border: none; border-bottom: 1px dashed #d0cdc7; padding: 4px 2px; color: #777; outline: none; }
+  .add-note-input { flex: 1; font-family: inherit; font-size: 0.7rem; font-weight: 200; background: transparent; border: none; border-bottom: 1px dashed #d0cdc7; padding: 3px 2px; color: #777; outline: none; }
   .add-note-input::placeholder { color: #ccc; font-weight: 400; }
   .add-item-btn { font-family: inherit; font-size: 0.75rem; font-weight: 800; background: none; border: 1px solid #d0cdc7; color: #888; padding: 4px 10px; cursor: pointer; border-radius: 2px; align-self: flex-end; }
   .add-item-btn:hover { background: #e8e5e0; }
   .edit-input { font-family: inherit; font-size: 0.95rem; background: #fff; border: 1px solid #d0cdc7; padding: 3px 6px; color: #1a1a1a; outline: none; width: 100%; border-radius: 2px; }
   .cat-edit-input { font-family: inherit; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; background: transparent; border: none; border-bottom: 1.5px dashed #d0cdc7; padding: 2px; color: #888; outline: none; width: 160px; }
   .move-select { font-family: inherit; font-size: 0.78rem; background: #fff; border: 1px solid #d0cdc7; color: #555; padding: 3px 6px; border-radius: 2px; cursor: pointer; outline: none; max-width: 140px; }
-  .new-cat-section { margin-bottom: 32px; padding: 16px 18px; border: 1.5px dashed #d0cdc7; border-radius: 4px; }
+  #categories-container { display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px; }
+  .new-cat-section { margin-bottom: 32px; padding: 12px 16px; border: 1.5px dashed #d0cdc7; border-radius: 4px; }
   .new-cat-label { font-weight: 800; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: #bbb; margin-bottom: 10px; }
   .new-cat-row { display: flex; gap: 8px; }
   .new-cat-input { flex: 1; font-family: inherit; font-size: 0.88rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background: transparent; border: none; border-bottom: 1.5px solid #d0cdc7; padding: 4px 2px; color: #888; outline: none; }
@@ -85,12 +87,32 @@
   li.item-dragging { opacity: 0.4; }
   li.item-drag-over { border-top: 2px solid #c9a84c; }
   .ul-drag-over { background: #f5f2ea; border-radius: 4px; }
+
+  /* Mobile: single column, tighter spacing, no hover-dependent UI */
+  @media (max-width: 700px) {
+    body { padding: 20px 16px; }
+    h1 { font-size: 1.5rem; }
+    #categories-container { grid-template-columns: 1fr; gap: 0; }
+    #completed-categories { grid-template-columns: 1fr; gap: 0; }
+    .block { margin-bottom: 20px; }
+    li { font-size: 0.88rem; padding: 8px 0; }
+    .item-actions { opacity: 1; }
+    .flag-btn { opacity: 0.35; }
+    li.flagged .flag-btn { opacity: 1; }
+    .action-btn { font-size: 0.78rem; padding: 4px 6px; }
+    .add-item-inputs { flex-direction: column; }
+    .new-cat-row { flex-direction: column; }
+    .settings-bar { flex-direction: column; align-items: stretch; }
+    .settings-input { min-width: 0; width: 100%; }
+    .move-select { max-width: none; width: 100%; }
+    .cat-edit-input { width: 100%; }
+  }
 </style>
 </head>
 <body>
 
 <h1>Today's Plan</h1>
-<div class="date">Saturday, June 27, 2026</div>
+<div class="date">Tuesday, July 1, 2026</div>
 
 <div class="settings-bar" id="settings-bar">
   <span class="settings-label">Sync</span>
@@ -120,7 +142,7 @@
 <div class="saving-indicator" id="saving-indicator">Saving...</div>
 
 <script>
-const DATE_KEY = '260627';
+const DATE_KEY = '260701';
 const STORAGE_KEY = 'daily_plan_' + DATE_KEY;
 const API_KEY_STORE = 'jsonbin_masterkey';
 const BIN_ID_STORE = 'jsonbin_binid_' + DATE_KEY;
@@ -131,89 +153,93 @@ let itemCounter = 100;
 const DEFAULT_STATE = {
   categories: [
     {
-      id: 'cat-claude', name: 'Claude & Project Docs',
-      items: [
-        { id: 'i3', text: 'Share Strata music demo', note: '', checked: false, catId: 'cat-claude' },
-        { id: 'i4', text: 'Organize files', note: 'downloads, iCloud, desktop', checked: false, catId: 'cat-claude' },
-        { id: 'i1', text: 'Upload recipe screenshots to Claude', note: 'exact amounts for chili + screenshot-based recipes', checked: true, catId: 'cat-claude' },
-        { id: 'i2', text: 'Upload Notion recipe markdown files', note: 'optional — CSV done, markdowns may have more detail', checked: true, catId: 'cat-claude' },
-      ]
-    },
-    {
       id: 'cat-family', name: 'Family',
       items: [
-        { id: 'i5', text: 'Pick up grandma from dialysis', note: '', checked: true, catId: 'cat-family' },
-      ]
-    },
-    {
-      id: 'cat-garden', name: 'Garden',
-      items: [
-        { id: 'i7', text: 'Plant tomatoes and petunias', note: '', checked: false, catId: 'cat-garden' },
+        { id: 'i5', text: 'Pick up grandma from dialysis', note: '', checked: true, flagged: false, catId: 'cat-family' },
       ]
     },
     {
       id: 'cat-fair', name: 'Errands',
       items: [
-        { id: 'i8', text: 'Go to the fair for lunch', note: 'corn dog, sesame chicken — note the place, pineapple whip or homemade ice cream, elephant ear maybe for grandma', checked: false, catId: 'cat-fair' },
-        { id: 'i6', text: "Go to Lowe's for flowers, dirt, and other items", note: 'check note', checked: false, catId: 'cat-fair' },
+        { id: 'i6', text: "Go to Lowe's for flowers, dirt, and other items (check note)", note: '', checked: false, flagged: false, catId: 'cat-fair' },
+        { id: 'i8', text: 'Go to the fair for lunch', note: 'corn dog, sesame chicken — note the place, pineapple whip or homemade ice cream, elephant ear maybe for grandma', checked: true, flagged: false, catId: 'cat-fair' },
       ]
     },
     {
-      id: 'cat-personal', name: 'Personal Care',
+      id: 'cat-garden', name: 'Garden',
       items: [
-        { id: 'i9', text: 'Haircut', note: '', checked: false, catId: 'cat-personal' },
-        { id: 'i10', text: 'Wash purse', note: '', checked: false, catId: 'cat-personal' },
-        { id: 'i12', text: 'Hand treatment', note: 'figure out setup', checked: false, catId: 'cat-personal' },
-        { id: 'i13', text: 'Find vitamin D and fish oil', note: '', checked: false, catId: 'cat-personal' },
+        { id: 'i7', text: 'Plant tomatoes and petunias', note: '', checked: false, flagged: false, catId: 'cat-garden' },
       ]
     },
     {
       id: 'cat-movement', name: 'Movement',
       items: [
-        { id: 'i15', text: 'Exercise', note: '', checked: false, catId: 'cat-movement' },
-        { id: 'i16', text: 'Walk to Lucabe Coffee', note: '3.2 miles', checked: false, catId: 'cat-movement' },
+        { id: 'i15', text: 'Exercise', note: '', checked: false, flagged: false, catId: 'cat-movement' },
+        { id: 'i16', text: 'Walk to Lucabe Coffee (3.2 miles)', note: '', checked: false, flagged: false, catId: 'cat-movement' },
+        { id: 'item-101-1782746892533', text: 'Go to Planet Fitness with Mom', note: '', checked: false, flagged: true, catId: 'cat-movement' },
+      ]
+    },
+    {
+      id: 'cat-personal', name: 'Personal Care',
+      items: [
+        { id: 'i12', text: 'Hand treatment', note: 'figure out setup', checked: false, flagged: false, catId: 'cat-personal' },
+        { id: 'i13', text: 'Find vitamin D and fish oil', note: '', checked: false, flagged: false, catId: 'cat-personal' },
+        { id: 'i9', text: 'Haircut', note: '', checked: false, flagged: false, catId: 'cat-personal' },
+        { id: 'item-102-1782604028131', text: 'Take lymphatic support liquid', note: '', checked: false, flagged: true, catId: 'cat-personal' },
+      ]
+    },
+    {
+      id: 'cat-claude', name: 'On Computer',
+      items: [
+        { id: 'i4', text: 'Organize files', note: 'downloads, iCloud, desktop', checked: false, flagged: false, catId: 'cat-claude' },
+        { id: 'i3', text: 'Share Strata music demo', note: '', checked: false, flagged: false, catId: 'cat-claude' },
+        { id: 'item-102-1782608614111', text: 'Work on to-do list life admin website', note: '', checked: false, flagged: false, catId: 'cat-claude' },
+        { id: 'item-101-1782608602535', text: 'Work on meal planning website', note: '', checked: false, flagged: false, catId: 'cat-claude' },
+        { id: 'i1', text: 'Upload recipe screenshots to Claude', note: 'exact amounts for chili + screenshot-based recipes', checked: true, flagged: false, catId: 'cat-claude' },
+        { id: 'i2', text: 'Upload Notion recipe markdown files', note: 'optional — CSV done, markdowns may have more detail', checked: true, flagged: false, catId: 'cat-claude' },
       ]
     },
     {
       id: 'cat-car', name: 'Car',
       items: [
-        { id: 'i20', text: 'Get brakes replaced', note: '', checked: false, catId: 'cat-car' },
-        { id: 'i19', text: 'Fill tires up', note: '', checked: true, catId: 'cat-car' },
-        { id: 'i18', text: 'Clean car interior', note: '', checked: true, catId: 'cat-car' },
-        { id: 'i17', text: 'Vacuum car', note: '', checked: true, catId: 'cat-car' },
+        { id: 'i20', text: 'Get brakes replaced', note: '', checked: false, flagged: false, catId: 'cat-car' },
+        { id: 'i19', text: 'Fill tires up', note: '', checked: true, flagged: false, catId: 'cat-car' },
+        { id: 'i18', text: 'Clean car interior', note: '', checked: true, flagged: false, catId: 'cat-car' },
+        { id: 'i17', text: 'Vacuum car', note: '', checked: true, flagged: false, catId: 'cat-car' },
       ]
     },
     {
       id: 'cat-kitchen', name: 'Kitchen & Food',
       items: [
-        { id: 'i21', text: 'Watch one pot pasta YouTube video', note: '~17 min — add ingredients to shopping list after', checked: false, catId: 'cat-kitchen' },
+        { id: 'i21', text: 'Watch one pot pasta YouTube video', note: '~17 min — add ingredients to shopping list after', checked: false, flagged: false, catId: 'cat-kitchen' },
       ]
     },
     {
       id: 'cat-pets', name: 'Pets',
       items: [
-        { id: 'i23', text: "Look into Paddy's records for vaccinations", note: '', checked: false, catId: 'cat-pets' },
-        { id: 'i22', text: 'Freeze peanut butter in Kong for dog treats', note: '', checked: false, catId: 'cat-pets' },
+        { id: 'i23', text: "Look into Paddy's records for vaccinations", note: '', checked: false, flagged: false, catId: 'cat-pets' },
+        { id: 'i22', text: 'Freeze peanut butter in Kong for dog treats', note: '', checked: false, flagged: false, catId: 'cat-pets' },
       ]
     },
     {
       id: 'cat-admin', name: 'Admin',
       items: [
-        { id: 'i24', text: 'Figure out tax payment for Ambitus work', note: '', checked: false, catId: 'cat-admin' },
-        { id: 'i25', text: 'Figure out Wi-Fi extender', note: '', checked: false, catId: 'cat-admin' },
+        { id: 'i24', text: 'Figure out tax payment for Ambitus work', note: '', checked: false, flagged: false, catId: 'cat-admin' },
+        { id: 'i25', text: 'Figure out Wi-Fi extender', note: '', checked: false, flagged: false, catId: 'cat-admin' },
       ]
     },
     {
       id: 'cat-1782601999805', name: 'Chores',
       items: [
-        { id: 'i14', text: 'Laundry', note: '', checked: false, catId: 'cat-1782601999805' },
+        { id: 'i14', text: 'Laundry', note: '', checked: false, flagged: false, catId: 'cat-1782601999805' },
+        { id: 'i10', text: 'Wash purse', note: '', checked: false, flagged: false, catId: 'cat-1782601999805' },
       ]
     },
     {
       id: 'cat-1782602024204', name: 'Hobbies',
       items: [
-        { id: 'i11', text: 'Read magazines', note: '', checked: false, catId: 'cat-1782602024204' },
-        { id: 'item-101-1782602035496', text: 'Play PS4', note: '', checked: false, catId: 'cat-1782602024204' },
+        { id: 'i11', text: 'Read magazines', note: '', checked: false, flagged: false, catId: 'cat-1782602024204' },
+        { id: 'item-101-1782602035496', text: 'Play PS4', note: '', checked: false, flagged: false, catId: 'cat-1782602024204' },
       ]
     },
   ]
@@ -344,7 +370,7 @@ function captureState() {
     block.querySelectorAll('li[data-id]').forEach(li => {
       const textSpan = li.querySelector('.item-text');
       const noteSpan = textSpan ? textSpan.querySelector('.note') : null;
-      const noteText = noteSpan ? noteSpan.textContent.replace(/^\(/, '').replace(/\)$/, '') : '';
+      const noteText = noteSpan ? noteSpan.textContent.slice(1, -1) : '';
       const fullText = textSpan ? textSpan.childNodes[0]?.textContent?.trim() || textSpan.innerText.split('(')[0].trim() : '';
       cat.items.push({
         id: li.dataset.id,
@@ -362,7 +388,7 @@ function captureState() {
   document.querySelectorAll('#completed-categories li[data-id]').forEach(li => {
     const textSpan = li.querySelector('.item-text');
     const noteSpan = textSpan ? textSpan.querySelector('.note') : null;
-    const noteText = noteSpan ? noteSpan.textContent.replace(/^\(/, '').replace(/\)$/, '') : '';
+    const noteText = noteSpan ? noteSpan.textContent.slice(1, -1) : '';
     const fullText = textSpan ? textSpan.childNodes[0]?.textContent?.trim() || '' : '';
     const catId = li.dataset.catId || 'cat-admin';
     const cat = categories.find(c => c.id === catId);
@@ -445,7 +471,7 @@ function createLi(id, text, note, flagged) {
   const li = document.createElement('li');
   li.dataset.id = id;
   li.draggable = true;
-  if (flagged) li.classList.add('flagged');
+  if (flagged === true) li.classList.add('flagged');
   const noteHtml = note ? ` <span class="note">(${note})</span>` : '';
   li.innerHTML = `<span class="flag-dot"></span><input type="checkbox"><button class="flag-btn" onclick="toggleFlag(this)" title="Flag">&#9679;</button><span class="item-text">${text}${noteHtml}</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span>`;
   attachItemDrag(li);
@@ -583,19 +609,30 @@ function addItem(btn) {
 function editItem(btn) {
   const li = btn.closest('li');
   const textSpan = li.querySelector('.item-text');
+  const noteSpan = textSpan ? textSpan.querySelector('.note') : null;
+  const noteText = noteSpan ? noteSpan.textContent.slice(1, -1) : '';
+  const mainText = textSpan ? (textSpan.childNodes[0]?.textContent?.trim() || '') : '';
+  li.dataset.editNote = noteText;
   const input = document.createElement('input');
-  input.className = 'edit-input'; input.value = textSpan.innerText;
-  textSpan.replaceWith(input); input.focus();
+  input.className = 'edit-input';
+  input.value = mainText;
+  textSpan.replaceWith(input);
+  input.focus();
   btn.textContent = 'save';
   btn.onclick = () => saveItem(btn, input);
   input.addEventListener('keydown', e => { if (e.key === 'Enter') saveItem(btn, input); });
 }
 
 function saveItem(btn, input) {
+  const li = btn.closest('li');
+  const note = li.dataset.editNote || '';
+  const noteHtml = note ? ` <span class="note">(${note})</span>` : '';
   const span = document.createElement('span');
-  span.className = 'item-text'; span.textContent = input.value;
+  span.className = 'item-text';
+  span.innerHTML = input.value + noteHtml;
   input.replaceWith(span);
   btn.textContent = 'edit'; btn.onclick = () => editItem(btn);
+  delete li.dataset.editNote;
   debouncedSave();
 }
 
@@ -659,7 +696,7 @@ function addCategory() {
 function toggleFlag(btn) {
   const li = btn.closest('li');
   li.classList.toggle('flagged');
-  debouncedSave();
+  saveState(); // immediate save for flag changes
 }
 
 // ---- DRAG: CATEGORIES ----
