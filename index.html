@@ -27,6 +27,12 @@
   li { font-weight: 400; font-size: 0.82rem; padding: 5px 0; border-bottom: 1px solid #ece9e3; color: #2a2a2a; display: flex; align-items: flex-start; gap: 8px; }
   li.checked { color: #bbb; text-decoration: line-through; text-decoration-color: #ccc; text-decoration-thickness: 1px; font-size: 0.65em; }
   li .item-text { flex: 1; }
+  .item-date { font-size: 0.66rem; font-weight: 400; color: #8a7550; background: #f0e9d8; padding: 2px 7px; border-radius: 9px; white-space: nowrap; flex-shrink: 0; margin-top: 1px; }
+  .item-drag-handle { cursor: grab; font-size: 0.75rem; color: #ccc; padding: 0 2px; user-select: none; line-height: 1.4; flex-shrink: 0; opacity: 0; transition: opacity 0.15s; }
+  li:hover .item-drag-handle { opacity: 1; }
+  .item-drag-handle:hover { color: #999; }
+  .add-date-input { font-family: inherit; font-size: 0.72rem; font-weight: 200; background: transparent; border: none; border-bottom: 1px dashed #d0cdc7; padding: 3px 2px; color: #777; outline: none; flex-shrink: 0; width: 118px; }
+  .edit-date-input { font-family: inherit; font-size: 0.78rem; background: #fff; border: 1px solid #d0cdc7; padding: 2px 5px; color: #555; outline: none; border-radius: 2px; margin-left: 6px; }
   li .item-actions { display: flex; gap: 4px; flex-shrink: 0; opacity: 0; transition: opacity 0.15s; }
   li:hover .item-actions { opacity: 1; }
   .action-btn { background: none; border: none; font-family: inherit; font-size: 0.72rem; color: #bbb; cursor: pointer; padding: 2px 4px; white-space: nowrap; }
@@ -97,10 +103,12 @@
     .block { margin-bottom: 20px; }
     li { font-size: 0.88rem; padding: 8px 0; }
     .item-actions { opacity: 1; }
+    .item-drag-handle { opacity: 0.5; }
     .flag-btn { opacity: 0.35; }
     li.flagged .flag-btn { opacity: 1; }
     .action-btn { font-size: 0.78rem; padding: 4px 6px; }
     .add-item-inputs { flex-direction: column; }
+    .add-date-input { width: 100%; }
     .new-cat-row { flex-direction: column; }
     .settings-bar { flex-direction: column; align-items: stretch; }
     .settings-input { min-width: 0; width: 100%; }
@@ -378,6 +386,7 @@ function captureState() {
         note: noteText,
         checked: li.classList.contains('checked'),
         flagged: li.classList.contains('flagged'),
+        date: li.dataset.date || '',
         catId: block.id
       });
     });
@@ -399,6 +408,7 @@ function captureState() {
         note: noteText,
         checked: true,
         flagged: li.classList.contains('flagged'),
+        date: li.dataset.date || '',
         catId
       });
     }
@@ -419,7 +429,7 @@ function renderState(state) {
     const ul = block.querySelector('ul');
     attachUlDrop(ul);
     cat.items.forEach(item => {
-      const li = createLi(item.id, item.text, item.note);
+      const li = createLi(item.id, item.text, item.note, item.flagged, item.date);
       if (item.checked) {
         li.classList.add('checked');
         li.dataset.catId = cat.id;
@@ -434,7 +444,7 @@ function renderState(state) {
   });
 
   // wire up new inputs
-  document.querySelectorAll('.add-item-input, .add-note-input').forEach(input => {
+  document.querySelectorAll('.add-item-input, .add-note-input, .add-date-input').forEach(input => {
     input.addEventListener('keydown', e => {
       if (e.key === 'Enter') addItem(input.closest('.add-item-row').querySelector('.add-item-btn'));
     });
@@ -459,6 +469,7 @@ function createCategoryBlock(id, name) {
       <div class="add-item-inputs">
         <input class="add-item-input" type="text" placeholder="Add item...">
         <input class="add-note-input" type="text" placeholder="Note (optional)...">
+        <input class="add-date-input" type="date" title="Optional date">
       </div>
       <button class="add-item-btn" onclick="addItem(this)">Add</button>
     </div>`;
@@ -467,15 +478,56 @@ function createCategoryBlock(id, name) {
   return block;
 }
 
-function createLi(id, text, note, flagged) {
+function createLi(id, text, note, flagged, date) {
   const li = document.createElement('li');
   li.dataset.id = id;
-  li.draggable = true;
+  li.draggable = false;
   if (flagged === true) li.classList.add('flagged');
+  if (date) li.dataset.date = date;
   const noteHtml = note ? ` <span class="note">(${note})</span>` : '';
-  li.innerHTML = `<span class="flag-dot"></span><input type="checkbox"><button class="flag-btn" onclick="toggleFlag(this)" title="Flag">&#9679;</button><span class="item-text">${text}${noteHtml}</span><span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span>`;
+  const dateHtml = date ? `<span class="item-date">${formatDateBadge(date)}</span>` : '';
+  li.innerHTML = `<span class="flag-dot"></span><input type="checkbox"><button class="flag-btn" onclick="toggleFlag(this)" title="Flag">&#9679;</button><span class="item-text">${text}${noteHtml}</span>${dateHtml}<span class="item-actions"><button class="action-btn" onclick="editItem(this)">edit</button><button class="action-btn" onclick="editDate(this)">date</button><button class="action-btn" onclick="showMoveSelect(this)">move</button><button class="action-btn" onclick="deleteItem(this)">&#x2715;</button></span><span class="item-drag-handle" title="Drag to reorder">&#8942;&#8942;</span>`;
   attachItemDrag(li);
   return li;
+}
+
+// ---- DATE BADGE ----
+function formatDateBadge(dateStr) {
+  // dateStr is YYYY-MM-DD
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function editDate(btn) {
+  const li = btn.closest('li');
+  document.querySelectorAll('.edit-date-input').forEach(i => i.remove());
+  const input = document.createElement('input');
+  input.type = 'date';
+  input.className = 'edit-date-input';
+  if (li.dataset.date) input.value = li.dataset.date;
+  btn.closest('.item-actions').appendChild(input);
+  input.focus();
+  const commit = () => {
+    const val = input.value;
+    input.remove();
+    let dateSpan = li.querySelector('.item-date');
+    if (val) {
+      li.dataset.date = val;
+      if (!dateSpan) {
+        dateSpan = document.createElement('span');
+        dateSpan.className = 'item-date';
+        li.querySelector('.item-text').after(dateSpan);
+      }
+      dateSpan.textContent = formatDateBadge(val);
+    } else {
+      delete li.dataset.date;
+      if (dateSpan) dateSpan.remove();
+    }
+    debouncedSave();
+  };
+  input.addEventListener('change', commit);
+  input.addEventListener('blur', () => { if (document.body.contains(input)) commit(); });
 }
 
 // ---- COMPLETED GROUPS ----
@@ -590,16 +642,18 @@ function addItem(btn) {
   const row = btn.closest('.add-item-row');
   const input = row.querySelector('.add-item-input');
   const noteInput = row.querySelector('.add-note-input');
+  const dateInput = row.querySelector('.add-date-input');
   const text = input.value.trim();
   if (!text) return;
   const note = noteInput ? noteInput.value.trim() : '';
+  const date = dateInput ? dateInput.value : '';
   const ul = btn.closest('.block').querySelector('ul');
   const id = 'item-' + (++itemCounter) + '-' + Date.now();
-  const li = createLi(id, text, note);
+  const li = createLi(id, text, note, false, date);
   const block = btn.closest('.block');
   ul.appendChild(li);
   attachCheckbox(li, block.id, block.querySelector('[data-label]').textContent);
-  input.value = ''; if (noteInput) noteInput.value = '';
+  input.value = ''; if (noteInput) noteInput.value = ''; if (dateInput) dateInput.value = '';
   input.focus();
   updateBlockVisibility(block);
   debouncedSave();
@@ -683,7 +737,7 @@ function addCategory() {
   const container = document.getElementById('categories-container');
   const block = createCategoryBlock(id, name);
   container.appendChild(block);
-  block.querySelectorAll('.add-item-input, .add-note-input').forEach(inp => {
+  block.querySelectorAll('.add-item-input, .add-note-input, .add-date-input').forEach(inp => {
     inp.addEventListener('keydown', e => {
       if (e.key === 'Enter') addItem(inp.closest('.add-item-row').querySelector('.add-item-btn'));
     });
@@ -757,6 +811,12 @@ function attachCategoryDrag(block) {
 let dragSrcLi = null;
 
 function attachItemDrag(li) {
+  const handle = li.querySelector('.item-drag-handle');
+  if (handle) {
+    handle.addEventListener('mousedown', () => { li.draggable = true; });
+    handle.addEventListener('touchstart', () => { li.draggable = true; }, { passive: true });
+    document.addEventListener('mouseup', () => { if (!li.classList.contains('item-dragging')) li.draggable = false; });
+  }
   li.addEventListener('dragstart', e => {
     // don't drag if clicking flag or action buttons
     if (e.target.classList.contains('flag-btn') || e.target.classList.contains('action-btn') || e.target.tagName === 'INPUT') {
@@ -769,6 +829,7 @@ function attachItemDrag(li) {
   });
   li.addEventListener('dragend', () => {
     li.classList.remove('item-dragging');
+    li.draggable = false;
     document.querySelectorAll('.item-drag-over').forEach(el => el.classList.remove('item-drag-over'));
     document.querySelectorAll('.ul-drag-over').forEach(el => el.classList.remove('ul-drag-over'));
     dragSrcLi = null;
